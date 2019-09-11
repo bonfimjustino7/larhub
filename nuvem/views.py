@@ -52,7 +52,7 @@ def persons_new(request):
         # store to file
         wc.to_file("media/usuario_pdf/alice.png")
         print("Imagem criada com sucesso")"""
-        generate(str(texto2.read()))
+        generate(str(texto2.read().decode('utf8')))
 
         form.save()
 
