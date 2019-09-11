@@ -1,4 +1,4 @@
-Django==2.2.1
+Django==2.2.4
 django-bootstrap-form==3.4
 Pillow==6.0.0
 PyPDF2==1.26.0
