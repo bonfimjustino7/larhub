@@ -15,16 +15,19 @@ from gerador.genwordcloud import generate
 def gerarNuvem(request):
     return 2
 
+
+def home(request):
+    return render(request, 'home.html')
+
+
 def persons_list(request):
     person = Person.objects.last()
+    generate(person.pdf.path)
+
     contexto = {
         'person': person
     }
     return render(request, 'person.html', contexto)
-
-
-def home(request):
-    return render(request, 'home.html')
 
 
 def persons_new(request):
@@ -52,9 +55,6 @@ def persons_new(request):
         # store to file
         wc.to_file("media/usuario_pdf/alice.png")
         print("Imagem criada com sucesso")"""
-        generate(str(texto2.read().decode('utf8')))
-
         form.save()
-
         return redirect('person_list')
     return render(request, 'person_form.html', {'form': form})

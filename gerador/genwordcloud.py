@@ -1,19 +1,26 @@
-import sys,os,re, glob
+import sys
+import os
+import re
+import glob
 from collections import Counter
 from wordcloud import WordCloud
-import matplotlib.pyplot as plt
+from .pdf2txt import pdfparser
 
-from django.conf import settings
 
-def generate(filename):
+def generate(nome_arquivo):
     excecoes = []
     for palavra in open('gerador/excecoes.txt').read().lower().split(','):
         excecoes.append(palavra.strip())
     for palavra in open('gerador/contexto.txt').read().lower().split(','):
         excecoes.append(palavra.strip())
 
-    palavras = re.findall(r'\w+', filename)
-    #palavras = open(filename)
+    prefix, file_extension = os.path.splitext(nome_arquivo)
+    if file_extension.lower() == 'pdf':
+        pdfparser(nome_arquivo)
+        nome_arquivo = prefix+'.txt'
+
+    palavras = re.findall(r'\w+', open(nome_arquivo).read().lower())
+    # palavras = open(filename)
     # Monta o texto final remove as palavras da lista de exceções e que sejam menores que 4 caracteres
     texto = ''
     frequencia = Counter()
@@ -39,7 +46,7 @@ def generate(filename):
 
     #image_filename = os.path.join(settings.MEDIA_URL, os.path.splitext(filename)[0] + '.jpg')
     cloud.to_file("media/usuario_pdf/nuvem_gerada.png")
-    print('Imagem Gerada')
+
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:

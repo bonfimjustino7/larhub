@@ -1,14 +1,14 @@
 import sys
 import os
-from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
-from pdfminer.converter import PDFPageAggregator
-from pdfminer.pdfpage import PDFPage
-from pdfminer.layout import LTTextBoxHorizontal
-from pdfminer.converter import XMLConverter, HTMLConverter, TextConverter
-from pdfminer.layout import LAParams
+from pdfminer3.pdfinterp import PDFResourceManager, PDFPageInterpreter
+from pdfminer3.converter import PDFPageAggregator
+from pdfminer3.pdfpage import PDFPage
+from pdfminer3.layout import LTTextBoxHorizontal
+from pdfminer3.converter import XMLConverter, HTMLConverter, TextConverter
+from pdfminer3.layout import LAParams
+
 
 def pdfparser(filename):
-
     fp = open(filename, 'rb')
     rsrcmgr = PDFResourceManager()
     codec = 'utf-8'

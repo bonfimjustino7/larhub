@@ -4,3 +4,9 @@ Pillow==6.0.0
 PyPDF2==1.26.0
 pytz==2019.1
 sqlparse==0.3.0
+six==1.12.0
+sqlparse==0.3.0
+wordcloud==1.5.0
+pdfminer3
+
+
