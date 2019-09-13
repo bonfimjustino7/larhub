@@ -19,7 +19,8 @@ def generate(nome_arquivo):
         pdfparser(nome_arquivo)
         nome_arquivo = prefix+'.txt'
 
-    palavras = re.findall(r'\w+', open(nome_arquivo).read().lower())
+
+    palavras = re.findall(r'\w+', open(nome_arquivo,  encoding='ISO-8859-1').read().lower())
     # palavras = open(filename)
     # Monta o texto final remove as palavras da lista de exceções e que sejam menores que 4 caracteres
     texto = ''

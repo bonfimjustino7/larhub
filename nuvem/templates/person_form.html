@@ -4,27 +4,28 @@
 {% block title %}Gerador de Nuvem{% endblock %}
 
 {% block main %}
-
+ {% if messages %}
+            {% for message in messages %}
+              {% if message.tags %}<div class="alert alert-{% if message.tags == 'error' %}danger{%else%}{{message.tags}}{%endif%} alert-dismissible fade show mt-3" role="alert">{{message}}<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>{% endif %}
+            {% endfor %}
+    {% endif %}
 <div class="row">
         <div class="col-sm">
-
         </div>
         <div class="col-sm">
                 <br><h1>Gerar Nuvem</h1><br>
                 <form method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
-                {{ form|bootstrap }}
-
-                <br><button type="submit" class="btn btn-info">Salvar</button>
-
+                        {% csrf_token %}
+                        {{ form|bootstrap }}
+                        <script src='https://www.google.com/recaptcha/api.js'></script>
+                        <div class="g-recaptcha" data-sitekey="6LfiSrgUAAAAAJE96IbTcGQRJRllU_0WKsaswaJ8" ></div>
+                        <br><button type="submit" class="btn btn-info">Salvar</button>
                 </form>
         </div>
         <div class="col-sm">
 
         </div>
 </div>
-
-
 
 {% endblock %}
 

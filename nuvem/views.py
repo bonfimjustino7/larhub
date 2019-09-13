@@ -1,5 +1,11 @@
 import os
+from csv import excel
+
 import numpy as np
+import json
+import urllib
+
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 
@@ -10,6 +16,7 @@ from .forms import DocumentoForm
 from PIL import Image
 from django.conf import settings
 from gerador.genwordcloud import generate
+from django.contrib import messages
 
 
 def gerarNuvem(request):
@@ -35,27 +42,28 @@ def new_doc(request):
     form = DocumentoForm(request.POST or None, request.FILES or None)
 
     if form.is_valid():
-        texto2 = form.cleaned_data['arquivo']
-        #print(dir(texto2))
-        #print(str(texto2.read()))
+        arquivo, extencao = os.path.splitext(str(form.cleaned_data['arquivo']))
 
-        """alice_mask = np.array(Image.open("media/usuario_pdf/cloud.png"))
-        stopwords = set(STOPWORDS)
+        ''' Begin reCAPTCHA validation '''
+        recaptcha_response = request.POST.get('g-recaptcha-response')
+        url = 'https://www.google.com/recaptcha/api/siteverify'
+        values = {
+            'secret': settings.GOOGLE_RECAPTCHA_SECRET_KEY,
+            'response': recaptcha_response
+        }
+        data = urllib.parse.urlencode(values).encode()
+        req = urllib.request.Request(url, data=data)
+        response = urllib.request.urlopen(req)
+        result = json.loads(response.read().decode())
+        ''' End reCAPTCHA validation '''
 
-        # Adicionando a lista stopwords em português
-        new_words = []
-        with open("media/usuario_pdf/palavras.txt", 'r') as f:
-            [new_words.append(word) for line in f for word in line.split()]
+        if result['success']:
+            if extencao == '.pdf' or extencao == '.txt':
+                form.save()
+                return redirect('nuvem')
+            else:
+                messages.error(request, 'Extenção do arquivo inválida, por favor selecione um arquivo .txt ou .pdf')
+        else:
+            messages.error(request, 'ReCAPTCHA inválido. Por favor tente novamente!')
 
-        new_stopwords = stopwords.union(new_words)
-        wc = WordCloud(background_color="white", max_words=200, mask=alice_mask,
-                       stopwords=new_stopwords, contour_width=3, contour_color='steelblue')
-        # generate word cloud
-        wc.generate(str(texto2.read()))
-
-        # store to file
-        wc.to_file("media/usuario_pdf/alice.png")
-        print("Imagem criada com sucesso")"""
-        form.save()
-        return redirect('nuvem')
     return render(request, 'person_form.html', {'form': form})
