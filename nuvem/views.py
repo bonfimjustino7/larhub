@@ -1,13 +1,13 @@
+import os
 import numpy as np
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 
 from wordcloud import WordCloud, STOPWORDS
 
-from .models import Person
-from .forms import PersonForm
+from .models import Documento
+from .forms import DocumentoForm
 from PIL import Image
-import os
 from django.conf import settings
 from gerador.genwordcloud import generate
 
@@ -20,21 +20,22 @@ def home(request):
     return render(request, 'home.html')
 
 
-def persons_list(request):
-    person = Person.objects.last()
-    generate(person.pdf.path)
+def nuvem(request):
+    documento = Documento.objects.last()
+    imagem = generate(documento.arquivo.path)
 
     contexto = {
-        'person': person
+        'doc': documento,
+        'nuvem': imagem
     }
-    return render(request, 'person.html', contexto)
+    return render(request, 'nuvem.html', contexto)
 
 
-def persons_new(request):
-    form = PersonForm(request.POST or None, request.FILES or None)
+def new_doc(request):
+    form = DocumentoForm(request.POST or None, request.FILES or None)
 
     if form.is_valid():
-        texto2 = form.cleaned_data['pdf']
+        texto2 = form.cleaned_data['arquivo']
         #print(dir(texto2))
         #print(str(texto2.read()))
 
@@ -56,5 +57,5 @@ def persons_new(request):
         wc.to_file("media/usuario_pdf/alice.png")
         print("Imagem criada com sucesso")"""
         form.save()
-        return redirect('person_list')
+        return redirect('nuvem')
     return render(request, 'person_form.html', {'form': form})

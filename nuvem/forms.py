@@ -1,11 +1,8 @@
 from django.forms import ModelForm
-from .models import Person
+from .models import Documento
 
 
-class PersonForm(ModelForm):
+class DocumentoForm(ModelForm):
     class Meta:
-        model = Person
-        fields = ['nome', 'idade', 'pdf']
-
-
-
+        model = Documento
+        fields = ['nome', 'email', 'arquivo']

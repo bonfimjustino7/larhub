@@ -1,7 +1,7 @@
 from django.contrib import admin
-from nuvem.models import Person
+from nuvem.models import Documento
 
 
-@admin.register(Person)
-class PersonAdmin(admin.ModelAdmin):
-    list_display = ('nome', 'idade', 'pdf',)
+@admin.register(Documento)
+class DocumentoAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'email', 'arquivo',)

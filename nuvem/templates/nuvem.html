@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %} Titulo {% endblock %}
+
+{% block main %}
+    <h1>Nuvem gerada !!</h1>
+    <p>Usuário: {{ doc.nome}}</p>
+    <p><a href="{{ doc.texto}}">Arquivo Texto Otimizado</a></p>
+    <p><a href="{{ doc.csv }}">Arquivo de Frequência</a></p>
+    <img src="{{ nuvem }}" alt="" height="500">
+{%endblock%}
+

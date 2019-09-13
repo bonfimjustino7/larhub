@@ -1,24 +1,19 @@
-
+import os
 from django.db import models
-from gerador.genwordcloud import generate
+from django.conf import settings
+
 
 class Documento(models.Model):
-    num_doc = models.CharField(max_length=50)
+    nome = models.CharField('Nome do pesquisador', max_length=60)
+    email = models.EmailField(max_length=50)
+    arquivo = models.FileField(upload_to='usuario_pdf', null=True, blank=True)
 
-    def __str__(self):
-        return self.num_doc
+    @property
+    def texto(self):
+        filename = os.path.splitext(os.path.basename(self.arquivo.path))[0]
+        return os.path.join(settings.MEDIA_URL, 'usuario_pdf', filename+'.txt')
 
-
-class Person(models.Model):
-    nome = models.CharField(max_length=30)
-    idade = models.IntegerField()
-    pdf = models.FileField(upload_to='usuario_pdf', null=True, blank=True)
-
-    def gerar(self):
-        for t in Person.objects.all():
-            generate(t.pdf)
-
-    #doc = models.OneToOneField(Documento, null=True, blank=True, on_delete=models.CASCADE)
-
-   # def __str__(self):
-   #     return self.first_name + ' ' + self.last_name
+    @property
+    def csv(self):
+        filename = os.path.splitext(os.path.basename(self.arquivo.path))[0]
+        return os.path.join(settings.MEDIA_URL, 'usuario_pdf', filename+'.csv')
