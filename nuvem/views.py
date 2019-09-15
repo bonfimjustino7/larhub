@@ -19,7 +19,7 @@ from gerador.genwordcloud import generate
 from django.contrib import messages
 from django.http import HttpResponseNotFound
 
-
+#testando nova branch
 def home(request):
     return render(request, 'home.html')
 
