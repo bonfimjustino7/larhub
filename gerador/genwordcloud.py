@@ -26,9 +26,7 @@ def generate(nome_arquivo):
         print('decode utf8')
     except UnicodeDecodeError as erro:
         palavras = re.findall(r'\w+', open(nome_arquivo,  encoding='ISO-8859-1').read().lower())
-        print('decode ISO-8859-1')
-    except:
-        return 'erro'
+        print('decode ISO-8859-1')    
 
     # palavras = open(filename)
     # Monta o texto final remove as palavras da lista de exceções e que sejam menores que 4 caracteres

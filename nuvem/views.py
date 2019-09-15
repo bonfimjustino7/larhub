@@ -27,9 +27,7 @@ def home(request):
 def nuvem(request):
     documento = Documento.objects.last()
     imagem = generate(documento.arquivo.path)
-    if imagem == 'erro':
-        return HttpResponseNotFound('<h1>Erro de encoding</h1> <p>Utile arquivos de textos em UTF-8 ou ISO-8859</p>')
-
+    
     contexto = {
         'doc': documento,
         'nuvem': imagem
