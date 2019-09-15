@@ -17,10 +17,7 @@ from PIL import Image
 from django.conf import settings
 from gerador.genwordcloud import generate
 from django.contrib import messages
-
-
-def gerarNuvem(request):
-    return 2
+from django.http import HttpResponseNotFound
 
 
 def home(request):
@@ -30,6 +27,8 @@ def home(request):
 def nuvem(request):
     documento = Documento.objects.last()
     imagem = generate(documento.arquivo.path)
+    if imagem == 'erro':
+        return HttpResponseNotFound('<h1>Erro de encoding</h1> <p>Utile arquivos de textos em UTF-8 ou ISO-8859</p>')
 
     contexto = {
         'doc': documento,
