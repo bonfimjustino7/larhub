@@ -37,7 +37,7 @@ def nuvem(request):
     }
     return render(request, 'nuvem.html', contexto)
 
-def decodificar(arquivo):
+def decodificar(request, arquivo):
     try:
         return arquivo.read().decode('utf8')
     except UnicodeDecodeError:
@@ -54,7 +54,7 @@ def new_doc(request):
         detectlanguage.configuration.api_key = settings.API_KEY_LANGUAGE
 
         arquivo = form.cleaned_data['arquivo'].read().decode('ISO-8859-1') #Usei esse decode, pois quando faço um try except p detectlanguage não recebe o texto convertido
-        #arquivo = decodificar(form.cleaned_data['arquivo'])
+        #arquivo = decodificar(request, form.cleaned_data['arquivo'])
         print(type(arquivo))
 
         lang_detect = detectlanguage.detect(arquivo)
