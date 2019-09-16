@@ -19,7 +19,22 @@ from gerador.genwordcloud import generate
 from django.contrib import messages
 from django.http import HttpResponseNotFound
 import detectlanguage
+import codecs
 
+''' Configuration API LANGUAGE DETECT'''
+detectlanguage.configuration.api_key = settings.API_KEY_LANGUAGE
+
+
+def decodificar(request, arquivo):
+    texto = ''
+    try:
+        texto = arquivo.read().decode().split('.')[0]
+        print('utf8')
+        return texto
+    except:
+        texto = arquivo.read().decode('ISO-8859-1').split('.')[0]
+        print('iso')
+        return texto
 
 
 #testando nova branch
@@ -29,37 +44,51 @@ def home(request):
 
 def nuvem(request):
     documento = Documento.objects.last()
-    imagem = generate(documento.arquivo.path)
-    
-    contexto = {
-        'doc': documento,
-        'nuvem': imagem
-    }
-    return render(request, 'nuvem.html', contexto)
+    print(settings.BASE_DIR)
+    existir = settings.BASE_DIR + documento.img
 
-def decodificar(request, arquivo):
-    try:
-        return arquivo.read().decode('utf8')
-    except UnicodeDecodeError:
-        return arquivo.read().decode('ISO-8859-1')
+    if(os.path.exists(existir)):
+        contexto = {
+            'doc': documento,
+            'nuvem': documento.img
+        }
+        return render(request, 'nuvem.html', contexto)
+    else:
+        imagem = generate(documento.arquivo.path)
+        print(documento.img)
 
-def new_doc(request):
-    form = DocumentoForm(request.POST or None, request.FILES or None)
+        caminho = documento.arquivo.path.split('.')[0] + '.txt'
 
-
-    if form.is_valid():
-        filename, extencao = os.path.splitext(str(form.cleaned_data['arquivo']))
-
-        ''' Configuration API LANGUAGE DETECT'''
-        detectlanguage.configuration.api_key = settings.API_KEY_LANGUAGE
-
-        arquivo = form.cleaned_data['arquivo'].read().decode('ISO-8859-1') #Usei esse decode, pois quando faço um try except p detectlanguage não recebe o texto convertido
-        #arquivo = decodificar(request, form.cleaned_data['arquivo'])
-        print(type(arquivo))
+        try:
+            arquivo = open(caminho).read().lower().split('.')[0]
+            print('abrindo utf8')
+            print(arquivo)
+        except UnicodeDecodeError as erro:
+            arquivo = open(caminho,  encoding='ISO-8859-1').read().lower().split('.')[0]
+            print(arquivo)
+            print('abrindo ISO-8859-1')
 
         lang_detect = detectlanguage.detect(arquivo)
         print(lang_detect)
         precisao = lang_detect[0]['confidence']
+        print(precisao)
+
+        if precisao > 7.5:
+            documento.language = lang_detect[0]['language']
+            documento.save()
+            print('adicionado lang')
+        contexto = {
+            'doc': documento,
+            'nuvem': imagem
+        }
+        return render(request, 'nuvem.html', contexto)
+
+
+def new_doc(request):
+    form = DocumentoForm(request.POST or None, request.FILES or None)
+
+    if form.is_valid():
+        filename, extencao = os.path.splitext(str(form.cleaned_data['arquivo']))
 
 
         ''' Begin reCAPTCHA validation '''
@@ -78,10 +107,7 @@ def new_doc(request):
         if result['success']:
             if extencao == '.pdf' or extencao == '.txt':
                 post = form.save(commit=False)
-                if precisao > 7.5:
-                    post.language = lang_detect[0]['language']
                 post.save()
-
                 return redirect('nuvem')
             else:
                 messages.error(request, 'Extenção do arquivo inválida, por favor selecione um arquivo .txt ou .pdf')

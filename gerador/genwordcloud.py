@@ -6,8 +6,7 @@ from collections import Counter
 from wordcloud import WordCloud
 from .pdf2txt import pdfparser
 from django.conf import settings
-from django.contrib import messages
-from django.http import HttpResponse
+import chardet
 
 def generate(nome_arquivo):
     excecoes = []
@@ -21,12 +20,13 @@ def generate(nome_arquivo):
         pdfparser(nome_arquivo)
         nome_arquivo = prefix+'.txt'
 
+
     try:
         palavras = re.findall(r'\w+', open(nome_arquivo).read().lower())
         print('decode utf8')
     except UnicodeDecodeError as erro:
         palavras = re.findall(r'\w+', open(nome_arquivo,  encoding='ISO-8859-1').read().lower())
-        print('decode ISO-8859-1')    
+        print('decode ISO-8859-1')
 
     # palavras = open(filename)
     # Monta o texto final remove as palavras da lista de exceções e que sejam menores que 4 caracteres

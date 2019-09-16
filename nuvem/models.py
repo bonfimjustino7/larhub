@@ -18,3 +18,8 @@ class Documento(models.Model):
     def csv(self):
         filename = os.path.splitext(os.path.basename(self.arquivo.path))[0]
         return os.path.join(settings.MEDIA_URL, 'usuario_pdf', filename+'.csv')
+
+    @property
+    def img(self):
+        filename = os.path.splitext(os.path.basename(self.arquivo.path))[0]
+        return os.path.join(settings.MEDIA_URL, 'usuario_pdf', filename + '.png')

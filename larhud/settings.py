@@ -129,6 +129,8 @@ STATICFILES_DIRS = [
     'estaticos',
 ]
 
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
 MEDIA_URL = '/media/'
 
 MEDIA_ROOT = 'media'
