@@ -18,6 +18,9 @@ from django.conf import settings
 from gerador.genwordcloud import generate
 from django.contrib import messages
 from django.http import HttpResponseNotFound
+import detectlanguage
+
+
 
 #testando nova branch
 def home(request):
@@ -34,12 +37,30 @@ def nuvem(request):
     }
     return render(request, 'nuvem.html', contexto)
 
+def decodificar(arquivo):
+    try:
+        return arquivo.read().decode('utf8')
+    except UnicodeDecodeError:
+        return arquivo.read().decode('ISO-8859-1')
 
 def new_doc(request):
     form = DocumentoForm(request.POST or None, request.FILES or None)
 
+
     if form.is_valid():
-        arquivo, extencao = os.path.splitext(str(form.cleaned_data['arquivo']))
+        filename, extencao = os.path.splitext(str(form.cleaned_data['arquivo']))
+
+        ''' Configuration API LANGUAGE DETECT'''
+        detectlanguage.configuration.api_key = settings.API_KEY_LANGUAGE
+
+        arquivo = form.cleaned_data['arquivo'].read().decode('ISO-8859-1') #Usei esse decode, pois quando faço um try except p detectlanguage não recebe o texto convertido
+        #arquivo = decodificar(form.cleaned_data['arquivo'])
+        print(type(arquivo))
+
+        lang_detect = detectlanguage.detect(arquivo)
+        print(lang_detect)
+        precisao = lang_detect[0]['confidence']
+
 
         ''' Begin reCAPTCHA validation '''
         recaptcha_response = request.POST.get('g-recaptcha-response')
@@ -56,7 +77,11 @@ def new_doc(request):
 
         if result['success']:
             if extencao == '.pdf' or extencao == '.txt':
-                form.save()
+                post = form.save(commit=False)
+                if precisao > 7.5:
+                    post.language = lang_detect[0]['language']
+                post.save()
+
                 return redirect('nuvem')
             else:
                 messages.error(request, 'Extenção do arquivo inválida, por favor selecione um arquivo .txt ou .pdf')
