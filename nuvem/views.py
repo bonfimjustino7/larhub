@@ -44,42 +44,32 @@ def home(request):
 
 def nuvem(request):
     documento = Documento.objects.last()
-    print(settings.BASE_DIR)
-    existir = settings.BASE_DIR + documento.img
 
-    if os.path.exists(existir):
-        contexto = {
-            'doc': documento,
-            'nuvem': documento.img
-        }
-        return render(request, 'nuvem.html', contexto)
-    else:
-        imagem = generate(documento.arquivo.path, documento.language)
-        caminho = documento.arquivo.path.split('.')[0] + '.txt'
+    imagem = generate(documento.arquivo.path, documento.language)
+    caminho = documento.arquivo.path.split('.')[0] + '.txt'
 
+    if not documento.language:
         try:
-            arquivo = open(caminho).read().lower().split('\n')[0:3]
+            linhas = open(caminho).read().lower().split('\n')[0:20]
             print('abrindo utf8')
-            print(arquivo)
         except UnicodeDecodeError as erro:
-            arquivo = open(caminho, encoding='ISO-8859-1').read().lower().split('.')[0:3]
-            print(arquivo)
+            linhas = open(caminho, encoding='ISO-8859-1').read().lower().split('.')[0:30]
             print('abrindo ISO-8859-1')
-
-        lang_detect = detectlanguage.detect(arquivo)
+        trecho = ' '.join([('' if len(linha) < 20 else linha) for linha in linhas])
+        lang_detect = detectlanguage.detect(trecho)
         print(lang_detect)
         precisao = lang_detect[0][0]['confidence']
         print(precisao)
-
-        if precisao > 7.5:
+        if precisao > 7:
             documento.language = lang_detect[0]['language']
             documento.save()
             print('adicionado lang')
-        contexto = {
-            'doc': documento,
-            'nuvem': imagem
-        }
-        return render(request, 'nuvem.html', contexto)
+
+    contexto = {
+        'doc': documento,
+        'nuvem': imagem
+    }
+    return render(request, 'nuvem.html', contexto)
 
 
 def new_doc(request):
