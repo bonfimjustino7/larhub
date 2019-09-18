@@ -44,6 +44,7 @@ def nuvem(request, id):
             linhas = open(caminho, encoding='ISO-8859-1').read().lower().split('.')[0:30]
             print('abrindo ISO-8859-1')
         trecho = ' '.join([('' if len(linha) < 20 else linha) for linha in linhas])
+        print(trecho)
         lang_detect = detectlanguage.detect(trecho)
         print(lang_detect)
         precisao = lang_detect[0]['confidence']
