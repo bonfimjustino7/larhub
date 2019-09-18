@@ -4,5 +4,5 @@ from nuvem.models import Documento
 
 @admin.register(Documento)
 class DocumentoAdmin(admin.ModelAdmin):
-    list_display = ('nome', 'email', 'arquivo', 'pdf_link')
+    list_display = ('nome', 'email', 'arquivo')
     readonly_fields = ['pdf_link']
