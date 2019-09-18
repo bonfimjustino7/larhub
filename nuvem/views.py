@@ -68,7 +68,7 @@ def nuvem(request):
 
         lang_detect = detectlanguage.detect(arquivo)
         print(lang_detect)
-        precisao = lang_detect[0]['confidence']
+        precisao = lang_detect[0][0]['confidence']
         print(precisao)
 
         if precisao > 7.5:
