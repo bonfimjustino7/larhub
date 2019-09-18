@@ -37,7 +37,7 @@ def decodificar(request, arquivo):
         return texto
 
 
-#testando nova branch
+# testando nova branch
 def home(request):
     return render(request, 'home.html')
 
@@ -47,24 +47,22 @@ def nuvem(request):
     print(settings.BASE_DIR)
     existir = settings.BASE_DIR + documento.img
 
-    if(os.path.exists(existir)):
+    if os.path.exists(existir):
         contexto = {
             'doc': documento,
             'nuvem': documento.img
         }
         return render(request, 'nuvem.html', contexto)
     else:
-        imagem = generate(documento.arquivo.path)
-        print(documento.img)
-
+        imagem = generate(documento.arquivo.path, documento.language)
         caminho = documento.arquivo.path.split('.')[0] + '.txt'
 
         try:
-            arquivo = open(caminho).read().lower().split('.')[0]
+            arquivo = open(caminho).read().lower().split('\n')[0:3]
             print('abrindo utf8')
             print(arquivo)
         except UnicodeDecodeError as erro:
-            arquivo = open(caminho,  encoding='ISO-8859-1').read().lower().split('.')[0]
+            arquivo = open(caminho, encoding='ISO-8859-1').read().lower().split('.')[0:3]
             print(arquivo)
             print('abrindo ISO-8859-1')
 
@@ -88,8 +86,7 @@ def new_doc(request):
     form = DocumentoForm(request.POST or None, request.FILES or None)
 
     if form.is_valid():
-        filename, extencao = os.path.splitext(str(form.cleaned_data['arquivo']))
-
+        filename, extensao = os.path.splitext(str(form.cleaned_data['arquivo']))
 
         ''' Begin reCAPTCHA validation '''
         recaptcha_response = request.POST.get('g-recaptcha-response')
@@ -105,12 +102,12 @@ def new_doc(request):
         ''' End reCAPTCHA validation '''
 
         if result['success']:
-            if extencao == '.pdf' or extencao == '.txt':
+            if extensao == '.pdf' or extensao == '.txt':
                 post = form.save(commit=False)
                 post.save()
                 return redirect('nuvem')
             else:
-                messages.error(request, 'Extenção do arquivo inválida, por favor selecione um arquivo .txt ou .pdf')
+                messages.error(request, 'Extensão do arquivo inválida, por favor selecione um arquivo .txt ou .pdf')
         else:
             messages.error(request, 'ReCAPTCHA inválido. Por favor tente novamente!')
 
