@@ -24,26 +24,13 @@ import codecs
 ''' Configuration API LANGUAGE DETECT'''
 detectlanguage.configuration.api_key = settings.API_KEY_LANGUAGE
 
-
-def decodificar(request, arquivo):
-    texto = ''
-    try:
-        texto = arquivo.read().decode().split('.')[0]
-        print('utf8')
-        return texto
-    except:
-        texto = arquivo.read().decode('ISO-8859-1').split('.')[0]
-        print('iso')
-        return texto
-
-
 # testando nova branch
 def home(request):
     return render(request, 'home.html')
 
 
-def nuvem(request):
-    documento = Documento.objects.last()
+def nuvem(request, id):
+    documento = Documento.objects.get(pk=id)
 
     imagem = generate(documento.arquivo.path, documento.language)
     caminho = documento.arquivo.path.split('.')[0] + '.txt'
@@ -52,13 +39,14 @@ def nuvem(request):
         try:
             linhas = open(caminho).read().lower().split('\n')[0:20]
             print('abrindo utf8')
+            print(linhas)
         except UnicodeDecodeError as erro:
             linhas = open(caminho, encoding='ISO-8859-1').read().lower().split('.')[0:30]
             print('abrindo ISO-8859-1')
         trecho = ' '.join([('' if len(linha) < 20 else linha) for linha in linhas])
         lang_detect = detectlanguage.detect(trecho)
         print(lang_detect)
-        precisao = lang_detect[0][0]['confidence']
+        precisao = lang_detect[0]['confidence']
         print(precisao)
         if precisao > 7:
             documento.language = lang_detect[0]['language']
@@ -95,7 +83,7 @@ def new_doc(request):
             if extensao == '.pdf' or extensao == '.txt':
                 post = form.save(commit=False)
                 post.save()
-                return redirect('nuvem')
+                return redirect('nuvem', id=post.pk)
             else:
                 messages.error(request, 'Extensão do arquivo inválida, por favor selecione um arquivo .txt ou .pdf')
         else:
