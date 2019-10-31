@@ -5,6 +5,6 @@ from .views import nuvem
 
 urlpatterns = [
     path('', new_doc, name="new_doc"),
-    path('nuvem/', nuvem, name="nuvem"),
+    path('nuvem/<int:id>', nuvem, name="nuvem"),
 
 ]
