@@ -1,9 +1,7 @@
 import os
-from csv import excel
-
-import numpy as np
 import json
 import urllib
+import codecs
 
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -17,10 +15,11 @@ from gerador.genwordcloud import generate
 from django.contrib import messages
 from django.http import HttpResponseNotFound
 import detectlanguage
-import codecs
+from gerador.pdf2txt import pdfparser
 
 ''' Configuration API LANGUAGE DETECT'''
 detectlanguage.configuration.api_key = settings.API_KEY_LANGUAGE
+
 
 # testando nova branch
 def home(request):
@@ -30,27 +29,25 @@ def home(request):
 def nuvem(request, id):
     documento = Documento.objects.get(pk=id)
 
-    imagem = generate(documento.arquivo.path, documento.language)
-    caminho = documento.arquivo.path.split('.')[0] + '.txt'
+    nome_arquivo = documento.arquivo.path
+    prefix, file_extension = os.path.splitext(nome_arquivo)
+    if file_extension.lower() == '.pdf':
+        pdfparser(documento.arquivo.path)
+        nome_arquivo = prefix+'.txt'
 
     if not documento.language:
         try:
-            linhas = open(caminho).read().lower().split('\n')[0:20]
-            print('abrindo utf8')
-            print(linhas)
+            linhas = open(nome_arquivo).read().lower().split('\n')[0:20]
         except UnicodeDecodeError as erro:
-            linhas = open(caminho, encoding='ISO-8859-1').read().lower().split('.')[0:30]
-            print('abrindo ISO-8859-1')
+            linhas = open(nome_arquivo, encoding='ISO-8859-1').read().lower().split('.')[0:20]
         trecho = ' '.join([('' if len(linha) < 20 else linha) for linha in linhas])
-        print(trecho)
         lang_detect = detectlanguage.detect(trecho)
-        print(lang_detect)
         precisao = lang_detect[0]['confidence']
-        print(precisao)
         if precisao > 7:
             documento.language = lang_detect[0]['language']
             documento.save()
-            print('adicionado lang')
+
+    imagem = generate(nome_arquivo, documento.language)
 
     contexto = {
         'doc': documento,

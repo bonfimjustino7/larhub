@@ -27,4 +27,4 @@ class Documento(models.Model):
 
     def pdf_link(self):
         return mark_safe('<a class="grp-button" href="/nuvem/nuvem/%s">Gerar Nuvem</a>' % self.id)
-    pdf_link.short_description =('Nuvem')
+    pdf_link.short_description = 'Nuvem'
