@@ -27,6 +27,8 @@ DEBUG = True
 
 GOOGLE_RECAPTCHA_SECRET_KEY = '6LfiSrgUAAAAALHJISz0vWaW1NlCKQgFAIos83h7'
 
+API_KEY_LANGUAGE = '5501130c4da2e24b9121071615910a69'
+
 ALLOWED_HOSTS = []
 
 
@@ -126,6 +128,8 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     'estaticos',
 ]
+
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 MEDIA_URL = '/media/'
 

@@ -1,15 +1,11 @@
 import os
-from csv import excel
-
-import numpy as np
 import json
 import urllib
+import codecs
 
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-
-from wordcloud import WordCloud, STOPWORDS
 
 from .models import Documento
 from .forms import DocumentoForm
@@ -18,16 +14,41 @@ from django.conf import settings
 from gerador.genwordcloud import generate
 from django.contrib import messages
 from django.http import HttpResponseNotFound
+import detectlanguage
+from gerador.pdf2txt import pdfparser
+
+''' Configuration API LANGUAGE DETECT'''
+detectlanguage.configuration.api_key = settings.API_KEY_LANGUAGE
 
 
+# testando nova branch
 def home(request):
     return render(request, 'home.html')
 
 
-def nuvem(request):
-    documento = Documento.objects.last()
-    imagem = generate(documento.arquivo.path)
-    
+def nuvem(request, id):
+    documento = Documento.objects.get(pk=id)
+
+    nome_arquivo = documento.arquivo.path
+    prefix, file_extension = os.path.splitext(nome_arquivo)
+    if file_extension.lower() == '.pdf':
+        pdfparser(documento.arquivo.path)
+        nome_arquivo = prefix+'.txt'
+
+    if not documento.language:
+        try:
+            linhas = open(nome_arquivo).read().lower().split('\n')[0:20]
+        except UnicodeDecodeError as erro:
+            linhas = open(nome_arquivo, encoding='ISO-8859-1').read().lower().split('.')[0:20]
+        trecho = ' '.join([('' if len(linha) < 20 else linha) for linha in linhas])
+        lang_detect = detectlanguage.detect(trecho)
+        precisao = lang_detect[0]['confidence']
+        if precisao > 7:
+            documento.language = lang_detect[0]['language']
+            documento.save()
+
+    imagem = generate(nome_arquivo, documento.language)
+
     contexto = {
         'doc': documento,
         'nuvem': imagem
@@ -39,7 +60,7 @@ def new_doc(request):
     form = DocumentoForm(request.POST or None, request.FILES or None)
 
     if form.is_valid():
-        arquivo, extencao = os.path.splitext(str(form.cleaned_data['arquivo']))
+        filename, extensao = os.path.splitext(str(form.cleaned_data['arquivo']))
 
         ''' Begin reCAPTCHA validation '''
         recaptcha_response = request.POST.get('g-recaptcha-response')
@@ -55,11 +76,12 @@ def new_doc(request):
         ''' End reCAPTCHA validation '''
 
         if result['success']:
-            if extencao == '.pdf' or extencao == '.txt':
-                form.save()
-                return redirect('nuvem')
+            if extensao == '.pdf' or extensao == '.txt':
+                post = form.save(commit=False)
+                post.save()
+                return redirect('nuvem', id=post.pk)
             else:
-                messages.error(request, 'Extenção do arquivo inválida, por favor selecione um arquivo .txt ou .pdf')
+                messages.error(request, 'Extensão do arquivo inválida, por favor selecione um arquivo .txt ou .pdf')
         else:
             messages.error(request, 'ReCAPTCHA inválido. Por favor tente novamente!')
 
