@@ -31,6 +31,7 @@ class Documento(models.Model):
         return mark_safe('<a class="grp-button" href="/nuvem/nuvem/%s">Gerar Nuvem</a>' % self.id)
     pdf_link.short_description = 'Nuvem'
 
+
 @receiver(post_delete, sender=Documento)
 def deletar_arquivos(sender, instance, **kwargs):
     diretorio = instance.arquivo.path
