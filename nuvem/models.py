@@ -2,7 +2,8 @@ import os
 from django.db import models
 from django.conf import settings
 from django.utils.html import mark_safe
-
+from django.dispatch import receiver
+from django.db.models.signals import *
 
 class Documento(models.Model):
     nome = models.CharField('Nome do pesquisador', max_length=60)
@@ -29,3 +30,15 @@ class Documento(models.Model):
     def pdf_link(self):
         return mark_safe('<a class="grp-button" href="/nuvem/nuvem/%s">Gerar Nuvem</a>' % self.id)
     pdf_link.short_description = 'Nuvem'
+
+@receiver(post_delete, sender=Documento)
+def deletar_arquivos(sender, instance, **kwargs):
+    diretorio = instance.arquivo.path
+    prefix, file_extension = os.path.splitext(diretorio)
+    arquivo_png = prefix + '.png'
+    arquivo_csv = prefix + '.csv'
+    os.remove(instance.arquivo.path)
+    if os.path.exists(arquivo_png):
+        os.remove(arquivo_png)
+    if os.path.exists(arquivo_csv):
+        os.remove(arquivo_csv)
