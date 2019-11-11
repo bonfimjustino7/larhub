@@ -22,10 +22,5 @@ DATABASES = {
 
 ALLOWED_HOSTS = ['%(host)s', 'www.%(host)s', ]
 
-INSTALLED_APPS += [
-    'django.contrib.staticfiles',
-    'theme',
-]
-
-REPLY_TO_EMAIL = u'%(from)s'
-DEFAULT_FROM_EMAIL = u'%(from)s'
+REPLY_TO_EMAIL = 'ppgci@eco.ufrj.br'
+DEFAULT_FROM_EMAIL = 'ppgci@eco.ufrj.br'
