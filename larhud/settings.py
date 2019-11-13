@@ -132,6 +132,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = 'media'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+print(STATIC_ROOT)
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
