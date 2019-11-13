@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from settings import *
+from larhud.settings import *
 
 DEBUG = False
 
@@ -8,6 +8,8 @@ for template_config in TEMPLATES:
 
 SITE_NAME = '%(titulo)s'
 SITE_HOST = 'http://%(host)s'
+
+GOOGLE_RECAPTCHA_SECRET_KEY = '6LfiSrgUAAAAALHJISz0vWaW1NlCKQgFAIos83h7'
 
 DATABASES = {
     'default': {

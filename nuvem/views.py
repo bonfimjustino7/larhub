@@ -58,24 +58,26 @@ def nuvem(request, id):
 
 def new_doc(request):
     form = DocumentoForm(request.POST or None, request.FILES or None)
+    recaptcha = getattr(settings, "GOOGLE_RECAPTCHA_PUBLIC_KEY", None)
 
     if form.is_valid():
         filename, extensao = os.path.splitext(str(form.cleaned_data['arquivo']))
+        if recaptcha:
+            recaptcha_response = request.POST.get('g-recaptcha-response')
+            url = 'https://www.google.com/recaptcha/api/siteverify'
+            values = {
+                'secret': settings.GOOGLE_RECAPTCHA_SECRET_KEY,
+                'response': recaptcha_response
+            }
+            data = urllib.parse.urlencode(values).encode()
+            req = urllib.request.Request(url, data=data)
+            response = urllib.request.urlopen(req)
+            result = json.loads(response.read().decode())
+            result = result['success']
+        else:
+            result = True
 
-        ''' Begin reCAPTCHA validation '''
-        recaptcha_response = request.POST.get('g-recaptcha-response')
-        url = 'https://www.google.com/recaptcha/api/siteverify'
-        values = {
-            'secret': settings.GOOGLE_RECAPTCHA_SECRET_KEY,
-            'response': recaptcha_response
-        }
-        data = urllib.parse.urlencode(values).encode()
-        req = urllib.request.Request(url, data=data)
-        response = urllib.request.urlopen(req)
-        result = json.loads(response.read().decode())
-        ''' End reCAPTCHA validation '''
-
-        if result['success']:
+        if result:
             if extensao == '.pdf' or extensao == '.txt':
                 post = form.save(commit=False)
                 post.save()
@@ -85,4 +87,4 @@ def new_doc(request):
         else:
             messages.error(request, 'ReCAPTCHA inválido. Por favor tente novamente!')
 
-    return render(request, 'person_form.html', {'form': form})
+    return render(request, 'person_form.html', {'form': form, 'recaptcha': recaptcha})
