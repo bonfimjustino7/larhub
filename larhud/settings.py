@@ -120,20 +120,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = [
     'estaticos',
 ]
-
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 MEDIA_URL = '/media/'
 
 MEDIA_ROOT = 'media'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-print(STATIC_ROOT)
 
-# URL prefix for static files.
-# Example: "http://media.lawrence.com/static/"
-STATIC_URL = '/static/'

@@ -4,3 +4,4 @@ larhud/local.py
 venv/*
 .idea/*
 media/*
+static/*
