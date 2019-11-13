@@ -9,7 +9,8 @@ for template_config in TEMPLATES:
 SITE_NAME = '%(titulo)s'
 SITE_HOST = 'http://%(host)s'
 
-GOOGLE_RECAPTCHA_SECRET_KEY = '6LfiSrgUAAAAALHJISz0vWaW1NlCKQgFAIos83h7'
+GOOGLE_RECAPTCHA_PUBLIC_KEY = ''
+GOOGLE_RECAPTCHA_SECRET_KEY = ''
 
 DATABASES = {
     'default': {

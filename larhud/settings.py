@@ -11,10 +11,11 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+sys.path.insert(0, BASE_DIR)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -26,7 +27,6 @@ SECRET_KEY = 'aus2botya&b3@*#qbk@j=#73087jm=)w5dz_f7a628p-$(*-yu'
 DEBUG = False
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -130,3 +130,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 MEDIA_URL = '/media/'
 
 MEDIA_ROOT = 'media'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+# URL prefix for static files.
+# Example: "http://media.lawrence.com/static/"
+STATIC_URL = '/static/'
