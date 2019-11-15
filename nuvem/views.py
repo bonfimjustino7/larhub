@@ -1,11 +1,14 @@
+import io
 import os
 import json
 import urllib
 import codecs
 
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.views.generic import CreateView
 
 from .models import Documento
 from .forms import DocumentoForm
@@ -19,7 +22,6 @@ from gerador.pdf2txt import pdfparser
 
 ''' Configuration API LANGUAGE DETECT'''
 detectlanguage.configuration.api_key = settings.API_KEY_LANGUAGE
-
 
 # testando nova branch
 def home(request):
@@ -55,7 +57,6 @@ def nuvem(request, id):
     }
     return render(request, 'nuvem.html', contexto)
 
-
 def new_doc(request):
     form = DocumentoForm(request.POST or None, request.FILES or None)
     recaptcha = getattr(settings, "GOOGLE_RECAPTCHA_PUBLIC_KEY", None)
@@ -78,10 +79,22 @@ def new_doc(request):
             result = True
 
         if result:
+
             if extensao == '.pdf' or extensao == '.txt':
                 post = form.save(commit=False)
-                post.save()
-                return redirect('nuvem', id=post.pk)
+                doc_extra = []
+                if request.FILES:
+                    for f in request.FILES.getlist('arquivo'):
+                        doc = Documento.objects.create(nome=post.nome, email=post.email, arquivo=f)
+                        doc_extra.append(open(doc.arquivo.path).read())
+                doc_inteiro = ''
+                for d in doc_extra:
+                    doc_inteiro += d
+                object = io.BytesIO(doc_inteiro.encode('utf-8'))
+                dir = os.path.join(settings.MEDIA_URL, 'usuario_pdf')
+                doc_extra = Documento.objects.create(nome=post.nome, email=post.email, arquivo=InMemoryUploadedFile(object, 'teste.txt', 'teste.txt', dir, object.getbuffer(), None))
+                return redirect('nuvem', doc_extra.pk)
+
             else:
                 messages.error(request, 'Extensão do arquivo inválida, por favor selecione um arquivo .txt ou .pdf')
         else:
