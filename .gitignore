@@ -1,5 +1,7 @@
 db.sqlite3
 *.pyc
+larhud/local.py
 venv/*
 .idea/*
 media/*
+static/*

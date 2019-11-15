@@ -38,7 +38,8 @@ def generate(nome_arquivo, language='pt-br'):
         for item in frequencia.most_common(100):
             writer.writerow(item)
 
-    cloud = WordCloud(width=1200, height=800, max_words=60, scale=2).generate_from_frequencies(frequencia)
+    cloud = WordCloud(width=1200, height=800, max_words=60, scale=2, background_color='white')
+    cloud.generate_from_frequencies(frequencia)
     cloud.to_file(prefix+'.png')
 
     image_filename = os.path.basename(prefix)

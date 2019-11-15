@@ -1,3 +1,4 @@
 {
-  "settings": "larhud/local.py"
+  "settings": "larhud/local.py",
+  "python": 3
 }
