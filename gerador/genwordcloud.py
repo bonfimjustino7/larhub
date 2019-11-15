@@ -7,7 +7,7 @@ import csv
 from collections import Counter
 from wordcloud import WordCloud
 from django.conf import settings
-
+from difflib import SequenceMatcher
 
 def generate(nome_arquivo, language='pt-br'):
     excecoes = []
@@ -17,20 +17,42 @@ def generate(nome_arquivo, language='pt-br'):
                 excecoes.append(palavra.strip())
 
     try:
-        palavras = re.findall(r'\w+', open(nome_arquivo).read().lower())
+        arquivo = open(nome_arquivo, 'r')
     except UnicodeDecodeError as erro:
-        palavras = re.findall(r'\w+', open(nome_arquivo,  encoding='ISO-8859-1').read().lower())
+        arquivo = open(nome_arquivo, 'r', encoding='ISO-8859-1')
+
+    # Busca cabeçalhos e rodapés
+    frequencia = Counter()
+    for linha in arquivo.read().lower().split('\n'):
+        if len(linha) > 3:
+            frequencia[linha] += 1
+    arquivo.close()
+
+    duplicadas = {}
+    for linha in frequencia.most_common():
+        if linha[1] > 3:
+            duplicadas[linha[0]] = 0
+        else:
+            break
+
+    palavras = []
+    prefix, file_extension = os.path.splitext(nome_arquivo)
+    arq_limpo = open(prefix+'.dedup', 'w')
+    for linha in open(nome_arquivo, 'r').read().lower().split('\n'):
+        if linha not in duplicadas:
+            arq_limpo.write(linha+'\n')
+            palavras += re.findall(r'\w+', linha)
+    arq_limpo.close()
 
     # Monta o texto final remove as palavras da lista de exceções e que sejam menores que 3 caracteres
     texto = ''
     frequencia = Counter()
-    for palavra in list(palavras):
+    for palavra in palavras:
         if len(palavra) > 3 and palavra not in excecoes:
             texto += ' ' + palavra
             frequencia[palavra] += 1
 
     # Gera o arquivo CSV com as frequências
-    prefix, file_extension = os.path.splitext(nome_arquivo)
     csv_filename = prefix + '.csv'
 
     with open(csv_filename, "w", newline='') as csv_file:
@@ -38,7 +60,8 @@ def generate(nome_arquivo, language='pt-br'):
         for item in frequencia.most_common(100):
             writer.writerow(item)
 
-    cloud = WordCloud(width=1200, height=800, max_words=60, scale=2).generate_from_frequencies(frequencia)
+    cloud = WordCloud(width=1200, height=800, max_words=50, scale=2, background_color='white')
+    cloud.generate_from_frequencies(frequencia)
     cloud.to_file(prefix+'.png')
 
     image_filename = os.path.basename(prefix)
