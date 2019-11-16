@@ -79,22 +79,31 @@ def new_doc(request):
             result = True
 
         if result:
-
             if extensao == '.pdf' or extensao == '.txt':
                 post = form.save(commit=False)
-                doc_extra = []
-                if request.FILES:
-                    for f in request.FILES.getlist('arquivo'):
-                        doc = Documento.objects.create(nome=post.nome, email=post.email, arquivo=f)
-                        doc_extra.append(open(doc.arquivo.path).read())
-                doc_inteiro = ''
-                for d in doc_extra:
-                    doc_inteiro += d
-                object = io.BytesIO(doc_inteiro.encode('utf-8'))
-                dir = os.path.join(settings.MEDIA_URL, 'usuario_pdf')
-                doc_extra = Documento.objects.create(nome=post.nome, email=post.email, arquivo=InMemoryUploadedFile(object, 'teste.txt', 'teste.txt', dir, object.getbuffer(), None))
-                return redirect('nuvem', doc_extra.pk)
 
+                if len(request.FILES.getlist('arquivo')) > 1:
+                    doc_extra = []
+                    for f in request.FILES.getlist('arquivo'):
+                        doc = Documento.objects.create(nome=post.nome, email=post.email, arquivo=f) #implementar a condição aqui se é pdf
+                        prefix, file_extension = os.path.splitext(doc.arquivo.path)
+                        if file_extension.lower() == '.pdf':
+                            pdfparser(doc.arquivo.path)
+                            nome_arquivo = prefix + '.txt'
+                            doc_extra.append(open(nome_arquivo).read())
+                        else:
+                            doc_extra.append(open(doc.arquivo.path).read())
+                    doc_inteiro = ''
+                    for d in doc_extra:
+                        doc_inteiro += d
+                    object = io.BytesIO(doc_inteiro.encode('utf-8'))
+                    dir = os.path.join(settings.MEDIA_URL, 'usuario_pdf')
+                    doc_extra = Documento.objects.create(nome=post.nome, email=post.email, arquivo=InMemoryUploadedFile(object, 'teste.txt', 'extra.txt', dir, object.getbuffer(), None))
+
+                    return redirect('nuvem', doc_extra.pk)
+                else:
+                    post.save()
+                    return redirect('nuvem', post.pk)
             else:
                 messages.error(request, 'Extensão do arquivo inválida, por favor selecione um arquivo .txt ou .pdf')
         else:
