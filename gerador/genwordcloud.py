@@ -9,6 +9,7 @@ from wordcloud import WordCloud
 from django.conf import settings
 from difflib import SequenceMatcher
 
+
 def generate(nome_arquivo, language='pt-br'):
     excecoes = []
     if language and os.path.exists('gerador/stopwords-%s.txt' % language):

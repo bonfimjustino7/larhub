@@ -39,7 +39,8 @@ def deletar_arquivos(sender, instance, **kwargs):
     prefix, file_extension = os.path.splitext(diretorio)
     arquivo_png = prefix + '.png'
     arquivo_csv = prefix + '.csv'
-    os.remove(instance.arquivo.path)
+    if os.path.exists(instance.arquivo.path):
+        os.remove(instance.arquivo.path)
     if os.path.exists(arquivo_png):
         os.remove(arquivo_png)
     if os.path.exists(arquivo_csv):
