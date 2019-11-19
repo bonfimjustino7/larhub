@@ -1,9 +1,7 @@
 {% extends 'base.html' %}
-{% load staticfiles %}
-{% block title %} Titulo {% endblock %}
-
+{% block title %}Gerador de Nuvem de Palavras{% endblock %}
 {% block main %}
-    <h1>Nuvem gerada !!</h1>
+    <h2>Nuvem gerada com sucesso!!</h2>
     <p>Usuário: {{ doc.nome}}</p>
     <p>Linguagem reconhecida: {{ doc.language }}</p>
     <p><a href="{{ doc.texto}}">Arquivo Texto Otimizado</a></p>

@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 {% load bootstrap %}
-
 {% block title %}Gerador de Nuvem de Palavras{% endblock %}
-
 {% block main %}
  {% if messages %}
             {% for message in messages %}
@@ -13,16 +11,16 @@
         <div class="col-sm-2">
         </div>
         <div class="col-sm-8">
-                <br><h1>Gerador de Nuvem de Palavras</h1><br>
-                <form method="POST" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        {{ form|bootstrap }}
-                        {% if recaptcha %}
-                        <script src='https://www.google.com/recaptcha/api.js'></script>
-                        <div class="g-recaptcha" data-sitekey="{{ recaptcha }}" ></div>
-                        {% endif %}
-                        <br><button type="submit" class="btn btn-info">Enviar</button>
-                </form>
+            <br/>
+            <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form|bootstrap }}
+                    {% if recaptcha %}
+                    <script src='https://www.google.com/recaptcha/api.js'></script>
+                    <div class="g-recaptcha" data-sitekey="{{ recaptcha }}" ></div>
+                    {% endif %}
+                    <br><button type="submit" class="btn btn-info">Enviar</button>
+            </form>
         </div>
    <div class="col-sm-2"></div>
 </div>

@@ -10,7 +10,7 @@ from django.conf import settings
 from difflib import SequenceMatcher
 
 
-def generate(nome_arquivo, language='pt-br'):
+def generate(nome_arquivo, language='pt'):
     excecoes = []
     if language and os.path.exists('gerador/stopwords-%s.txt' % language):
         for linha in open('gerador/stopwords-%s.txt' % language).read().lower().split('\n'):

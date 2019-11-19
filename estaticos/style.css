@@ -1,3 +1,19 @@
-.home {
-    color: red;
+@import url("https://fonts.googleapis.com/css?family=Lexend+Deca|Montserrat:400,500,600,700&display=swap");
+body{
+    font-family: 'Lexend Deca', sans-serif;
+}
+.topo {
+    background: url(fundo.jpg) no-repeat;
+    background-size: 100%;
+    color: white;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    /* border-bottom: 5px solid #e0e0e0; */
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+}
+.topo h1{
+    margin-left: 20px;
+    font-size: 30px;
+    align-items: center;
 }

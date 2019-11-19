@@ -1,4 +1,5 @@
 import os
+import glob
 from django.db import models
 from django.conf import settings
 from django.utils.html import mark_safe
@@ -16,12 +17,12 @@ class Documento(models.Model):
     @property
     def texto(self):
         filename = os.path.splitext(os.path.basename(self.arquivo.path))[0]
-        return os.path.join(settings.MEDIA_URL, 'usuario_pdf', filename+'.txt')
+        return os.path.join(settings.MEDIA_URL, 'usuario_pdf', filename + '.txt')
 
     @property
     def csv(self):
         filename = os.path.splitext(os.path.basename(self.arquivo.path))[0]
-        return os.path.join(settings.MEDIA_URL, 'usuario_pdf', filename+'.csv')
+        return os.path.join(settings.MEDIA_URL, 'usuario_pdf', filename + '.csv')
 
     @property
     def img(self):
@@ -30,18 +31,12 @@ class Documento(models.Model):
 
     def pdf_link(self):
         return mark_safe('<a class="grp-button" href="/nuvem/nuvem/%s">Gerar Nuvem</a>' % self.id)
+
     pdf_link.short_description = 'Nuvem'
 
 
 @receiver(post_delete, sender=Documento)
 def deletar_arquivos(sender, instance, **kwargs):
-    diretorio = instance.arquivo.path
-    prefix, file_extension = os.path.splitext(diretorio)
-    arquivo_png = prefix + '.png'
-    arquivo_csv = prefix + '.csv'
-    if os.path.exists(instance.arquivo.path):
-        os.remove(instance.arquivo.path)
-    if os.path.exists(arquivo_png):
-        os.remove(arquivo_png)
-    if os.path.exists(arquivo_csv):
-        os.remove(arquivo_csv)
+    prefix = os.path.splitext(instance.arquivo.path)[0]
+    for filePath in glob.glob(prefix + '.*'):
+        os.remove(filePath)
