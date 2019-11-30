@@ -8,8 +8,6 @@
 7
 8
 9
-_
-a
 actualmente
 acuerdo
 adelante
@@ -730,3 +728,4 @@ z
 últimas
 último
 últimos
+http, https,

@@ -12,8 +12,10 @@ from difflib import SequenceMatcher
 
 def generate(nome_arquivo, language='pt'):
     excecoes = []
-    if language and os.path.exists('gerador/stopwords-%s.txt' % language):
-        for linha in open('gerador/stopwords-%s.txt' % language).read().lower().split('\n'):
+    sw_filename = os.path.join(settings.BASE_DIR, 'gerador', 'stopwords-%s.txt' % language)
+    print(sw_filename)
+    if language and os.path.exists(sw_filename):
+        for linha in open(sw_filename).read().lower().split('\n'):
             for palavra in linha.split(','):
                 excecoes.append(palavra.strip())
 
