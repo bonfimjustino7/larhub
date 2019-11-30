@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('nome', models.CharField(max_length=30)),
                 ('age', models.IntegerField()),
-                ('pdf', models.FileField(blank=True, null=True, upload_to='usuario_pdf')),
+                ('pdf', models.FileField(blank=True, null=True, upload_to='output')),
                 ('doc', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='nuvem.Documento')),
             ],
         ),

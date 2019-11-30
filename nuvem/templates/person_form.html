@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 {% load bootstrap %}
-
-{% block title %}Gerador de Nuvem{% endblock %}
-
+{% block title %}Gerador de Nuvem de Palavras{% endblock %}
 {% block main %}
  {% if messages %}
             {% for message in messages %}
@@ -10,23 +8,37 @@
             {% endfor %}
     {% endif %}
 <div class="row">
-        <div class="col-sm">
+        <div class="col-sm-2">
         </div>
-        <div class="col-sm">
-                <br><h1>Gerar Nuvem</h1><br>
-                <form method="POST" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        {{ form|bootstrap }}
-                        <script src='https://www.google.com/recaptcha/api.js'></script>
-                        {% if recaptcha %}
-                        <div class="g-recaptcha" data-sitekey="{{ recaptcha }}" ></div>
-                        {% endif %}
-                        <br><button type="submit" class="btn btn-info">Salvar</button>
-                </form>
+        <div class="col-sm-8">
+            <br/>
+            <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form|bootstrap }}
+                    {% if recaptcha %}
+                    <script src='https://www.google.com/recaptcha/api.js'></script>
+                    <div class="g-recaptcha" data-sitekey="{{ recaptcha }}" ></div>
+                    {% endif %}
+                    <br><button type="submit" class="btn btn-info">Enviar</button>
+            </form>
         </div>
-        <div class="col-sm">
-
-        </div>
+   <div class="col-sm-2"></div>
+</div>
+<div class="row">
+   <div class="col-sm-2"></div>
+   <div class="col-sm-8">
+    <br/>
+    <p>Instruções:</p>
+    <ul>
+        <li>Indique o seu nome e email para que a equipe do Larhud possa entrar em contato com você</li>
+        <li>Selecione um ou mais arquivos no formato PDF ou TXT</li>
+        <li>Para que a nuvem faça sentido, envie os arquivos em um único idioma</li>
+        <li>A geração da nuvem de palavras consegue identificar qual o idioma dos arquivos e remove stopwords baseada na linguagem identificada.</li>
+        <li>Cabeçalhos e rodapés de artigos já são identificados e removidos automaticamente</li>
+        <li>Caso tenha dúvidas ou sugestões, envie email para <a href="mailto:josir@irdx.com.br">josir@irdx.com.br</a></li>
+    </ul>
+   </div>
+   <div class="col-sm-2"></div>
 </div>
 
 {% endblock %}

@@ -19,6 +19,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='documento',
             name='arquivo',
-            field=models.FileField(blank=True, null=True, upload_to='usuario_pdf', verbose_name='Arquivo em PDF ou Texto'),
+            field=models.FileField(blank=True, null=True, upload_to='output', verbose_name='Arquivo em PDF ou Texto'),
         ),
     ]

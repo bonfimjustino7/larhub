@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='documento',
             name='arquivo',
-            field=models.FileField(default='1', upload_to='usuario_pdf', verbose_name='Arquivo em PDF ou Texto'),
+            field=models.FileField(default='1', upload_to='output', verbose_name='Arquivo em PDF ou Texto'),
             preserve_default=False,
         ),
         migrations.AlterField(

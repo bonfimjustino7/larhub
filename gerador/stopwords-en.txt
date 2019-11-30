@@ -1,4 +1,3 @@
-i
 me
 my
 myself
@@ -51,7 +50,6 @@ do
 does
 did
 doing
-a
 an
 the
 and
@@ -117,11 +115,10 @@ so
 than
 too
 very
-s
-t
 can
 will
 just
 don
 should
 now
+http, https

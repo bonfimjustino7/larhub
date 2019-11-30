@@ -1,27 +1,22 @@
 import os
+import uuid
 import json
 import urllib
-import codecs
+import detectlanguage
 
-from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
 
 from .models import Documento
 from .forms import DocumentoForm
-from PIL import Image
 from django.conf import settings
 from gerador.genwordcloud import generate
 from django.contrib import messages
-from django.http import HttpResponseNotFound
-import detectlanguage
-from gerador.pdf2txt import pdfparser
+from gerador.pdf2txt import pdf2txt
 
 ''' Configuration API LANGUAGE DETECT'''
 detectlanguage.configuration.api_key = settings.API_KEY_LANGUAGE
 
 
-# testando nova branch
 def home(request):
     return render(request, 'home.html')
 
@@ -31,9 +26,10 @@ def nuvem(request, id):
 
     nome_arquivo = documento.arquivo.path
     prefix, file_extension = os.path.splitext(nome_arquivo)
-    if file_extension.lower() == '.pdf':
-        pdfparser(documento.arquivo.path)
-        nome_arquivo = prefix+'.txt'
+    if not os.path.exists(prefix+'.txt'):
+        pdf2txt(documento.arquivo.path)
+
+    nome_arquivo = prefix+'.txt'
 
     if not documento.language:
         try:
@@ -42,10 +38,11 @@ def nuvem(request, id):
             linhas = open(nome_arquivo, encoding='ISO-8859-1').read().lower().split('.')[0:20]
         trecho = ' '.join([('' if len(linha) < 20 else linha) for linha in linhas])
         lang_detect = detectlanguage.detect(trecho)
-        precisao = lang_detect[0]['confidence']
-        if precisao > 7:
-            documento.language = lang_detect[0]['language']
-            documento.save()
+        if len(lang_detect) > 0:
+            precisao = lang_detect[0]['confidence']
+            if precisao > 7:
+                documento.language = lang_detect[0]['language']
+                documento.save()
 
     imagem = generate(nome_arquivo, documento.language)
 
@@ -61,7 +58,6 @@ def new_doc(request):
     recaptcha = getattr(settings, "GOOGLE_RECAPTCHA_PUBLIC_KEY", None)
 
     if form.is_valid():
-        filename, extensao = os.path.splitext(str(form.cleaned_data['arquivo']))
         if recaptcha:
             recaptcha_response = request.POST.get('g-recaptcha-response')
             url = 'https://www.google.com/recaptcha/api/siteverify'
@@ -78,12 +74,42 @@ def new_doc(request):
             result = True
 
         if result:
-            if extensao == '.pdf' or extensao == '.txt':
-                post = form.save(commit=False)
-                post.save()
-                return redirect('nuvem', id=post.pk)
+            post = form.save(commit=False)
+            if request.FILES:
+                # Verifica se todos os arquivos são PDF ou TXT antes de gravar
+                for f in request.FILES.getlist('arquivo'):
+                    filename, extensao = os.path.splitext(str(f))
+                    if not (extensao == '.pdf' or extensao == '.txt'):
+                        messages.error(request,
+                                       'Extensão do arquivo %s inválida. Por favor selecione arquivos .txt ou .pdf' %
+                                       filename)
+                        return render(request, 'person_form.html', {'form': form, 'recaptcha': recaptcha})
+
+                docs = []
+                for f in request.FILES.getlist('arquivo'):
+                    filename, extensao = os.path.splitext(str(f))
+                    doc = Documento.objects.create(nome=post.nome, email=post.email, arquivo=f)
+                    if extensao == '.pdf':
+                        pdf2txt(doc.arquivo.path)
+                    docs.append(doc)
+
+                if len(docs) > 1:
+                    extra_filename = str(uuid.uuid4())+'.txt'
+                    extra_file = open(os.path.join(settings.MEDIA_ROOT, 'output',extra_filename), 'w+')
+                    for doc in docs:
+                        filename, extensao = os.path.splitext(doc.arquivo.path)
+                        with open(filename+'.txt','r') as f:
+                            extra_file.write(f.read())
+                            extra_file.write('\n')
+                    extra_file.close()
+                    extra_filename = os.path.join('output', extra_filename)
+                    doc_extra = Documento.objects.create(nome=post.nome, email=post.email, arquivo=extra_filename)
+                    return redirect('nuvem', doc_extra.pk)
+                else:
+                    return redirect('nuvem', docs[0].pk)
             else:
-                messages.error(request, 'Extensão do arquivo inválida, por favor selecione um arquivo .txt ou .pdf')
+                messages.error(request, 'Nenhum arquivo enviado')
+
         else:
             messages.error(request, 'ReCAPTCHA inválido. Por favor tente novamente!')
 
