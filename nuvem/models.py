@@ -6,6 +6,10 @@ from django.utils.html import mark_safe
 from django.dispatch import receiver
 from django.db.models.signals import *
 
+TYPES = [
+    ('simple_text', 'Texto Simples'),
+    ('keywords', 'Palavras Chaves'),
+]
 
 class Documento(models.Model):
     nome = models.CharField('Nome do pesquisador', max_length=60)
@@ -13,6 +17,7 @@ class Documento(models.Model):
     arquivo = models.FileField('Arquivo em PDF ou Texto', upload_to='output', max_length=200)
     language = models.CharField('Linguagem', max_length=5, null=True, blank=True)
     titulo = models.TextField('Título do artigo/livro', null=True, blank=True)
+    tipo = models.CharField(max_length=12, choices=TYPES, null=True, blank=True)
 
     @property
     def texto(self):

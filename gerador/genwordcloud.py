@@ -10,6 +10,46 @@ from django.conf import settings
 from difflib import SequenceMatcher
 
 
+def generate_words(nome_arquivo, language='pt'):
+    prefix, file_extension = os.path.splitext(nome_arquivo)
+
+    try:
+        arquivo = open(nome_arquivo, 'r')
+    except UnicodeDecodeError as erro:
+        arquivo = open(nome_arquivo, 'r', encoding='ISO-8859-1')
+
+    frequencia = Counter()
+    for linha in arquivo.read().split(','):
+        linha = linha.strip()
+        if len(linha) > 3:
+            frequencia[linha] += 1
+    arquivo.close()
+
+    duplicadas = {}
+    for linha in frequencia.most_common():
+        if linha[1] > 3:
+            duplicadas[linha[0]] = 0
+        else:
+            break
+
+        # Gera o arquivo CSV com as frequências
+    csv_filename = prefix + '.csv'
+
+    with open(csv_filename, "w", newline='') as csv_file:
+        writer = csv.writer(csv_file, delimiter=',')
+        for item in frequencia.most_common(100):
+            writer.writerow(item)
+
+    cloud = WordCloud(width=1200, height=800, max_words=60, scale=2, background_color='white')
+    cloud.generate_from_frequencies(frequencia)
+    cloud.to_file(prefix + '.png')
+
+    image_filename = os.path.basename(prefix)
+    image_filename = os.path.join(settings.MEDIA_URL, 'output', image_filename + '.png')
+    return image_filename
+
+
+
 def generate(nome_arquivo, language='pt'):
     excecoes = []
     sw_filename = os.path.join(settings.BASE_DIR, 'gerador', 'stopwords-%s.txt' % language)

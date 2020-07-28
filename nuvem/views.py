@@ -1,4 +1,5 @@
 import os
+import re
 import uuid
 import json
 import urllib
@@ -9,7 +10,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Documento
 from .forms import DocumentoForm
 from django.conf import settings
-from gerador.genwordcloud import generate
+from gerador.genwordcloud import generate, generate_words
 from django.contrib import messages
 from gerador.pdf2txt import pdf2txt
 
@@ -44,7 +45,11 @@ def nuvem(request, id):
                 documento.language = lang_detect[0]['language']
                 documento.save()
 
-    imagem = generate(nome_arquivo, documento.language)
+    if documento.tipo == 'keywords':
+        imagem = generate_words(nome_arquivo, documento.language)
+
+    else:
+        imagem = generate(nome_arquivo, documento.language)
 
     contexto = {
         'doc': documento,
@@ -76,37 +81,62 @@ def new_doc(request):
         if result:
             post = form.save(commit=False)
             if request.FILES:
-                # Verifica se todos os arquivos são PDF ou TXT antes de gravar
-                for f in request.FILES.getlist('arquivo'):
-                    filename, extensao = os.path.splitext(str(f))
-                    if not (extensao == '.pdf' or extensao == '.txt'):
-                        messages.error(request,
-                                       'Extensão do arquivo %s inválida. Por favor selecione arquivos .txt ou .pdf' %
-                                       filename)
-                        return render(request, 'person_form.html', {'form': form, 'recaptcha': recaptcha})
+                if post.tipo == 'keywords':
+                    filename = os.path.join(settings.MEDIA_ROOT,'output', post.arquivo.name)
+                    with open(filename, 'w') as file_writer:
+                        for file in request.FILES.getlist('arquivo'):
+                            file_str = file.read().decode()
+                            file_str = re.sub(r'[\n]', ',', file_str)
+                            file_str = file_str.replace('\r', '')
+                            linhas = []
+                            for linha in file_str.split(','):
+                                linha = linha.strip()
+                                if len(linha) > 50:
+                                    linhas.append(linha.replace(' ', ''))
+                                else:
+                                    linhas.append(linha)
 
-                docs = []
-                for f in request.FILES.getlist('arquivo'):
-                    filename, extensao = os.path.splitext(str(f))
-                    doc = Documento.objects.create(nome=post.nome, email=post.email, arquivo=f)
-                    if extensao == '.pdf':
-                        pdf2txt(doc.arquivo.path)
-                    docs.append(doc)
+                            file_str = ','.join(linhas)
 
-                if len(docs) > 1:
-                    extra_filename = str(uuid.uuid4())+'.txt'
-                    extra_file = open(os.path.join(settings.MEDIA_ROOT, 'output',extra_filename), 'w+')
-                    for doc in docs:
-                        filename, extensao = os.path.splitext(doc.arquivo.path)
-                        with open(filename+'.txt','r') as f:
-                            extra_file.write(f.read())
-                            extra_file.write('\n')
-                    extra_file.close()
-                    extra_filename = os.path.join('output', extra_filename)
-                    doc_extra = Documento.objects.create(nome=post.nome, email=post.email, arquivo=extra_filename)
-                    return redirect('nuvem', doc_extra.pk)
+                            file_writer.write(file_str)
+
+                    doc = Documento.objects.create(nome=post.nome, email=post.email, arquivo=filename,
+                                                   tipo=post.tipo)
+
+                    return redirect('nuvem', doc.pk)
                 else:
-                    return redirect('nuvem', docs[0].pk)
+                    # Verifica se todos os arquivos são PDF ou TXT antes de gravar
+                    for f in request.FILES.getlist('arquivo'):
+                        filename, extensao = os.path.splitext(str(f))
+                        if not (extensao == '.pdf' or extensao == '.txt'):
+                            messages.error(request,
+                                           'Extensão do arquivo %s inválida. Por favor selecione arquivos .txt ou .pdf' %
+                                           filename)
+                            return render(request, 'person_form.html', {'form': form, 'recaptcha': recaptcha})
+
+                    docs = []
+                    for f in request.FILES.getlist('arquivo'):
+                        filename, extensao = os.path.splitext(str(f))
+                        doc = Documento.objects.create(nome=post.nome, email=post.email, arquivo=f, tipo=post.tipo)
+                        if extensao == '.pdf':
+                            pdf2txt(doc.arquivo.path)
+                        docs.append(doc)
+
+                    if len(docs) > 1:
+                        extra_filename = str(uuid.uuid4())+'.txt'
+                        extra_file = open(os.path.join(settings.MEDIA_ROOT, 'output',extra_filename), 'w+')
+                        for doc in docs:
+                            filename, extensao = os.path.splitext(doc.arquivo.path)
+                            with open(filename+'.txt','r') as f:
+                                extra_file.write(f.read())
+                                extra_file.write('\n')
+                        extra_file.close()
+                        extra_filename = os.path.join('output', extra_filename)
+                        doc_extra = Documento.objects.create(nome=post.nome, email=post.email, arquivo=extra_filename,
+                                                             tipo=post.tipo)
+                        return redirect('nuvem', doc_extra.pk)
+                    else:
+                        return redirect('nuvem', docs[0].pk)
             else:
                 messages.error(request, 'Nenhum arquivo enviado')
 
