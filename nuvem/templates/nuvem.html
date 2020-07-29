@@ -19,11 +19,19 @@
 {% endblock %}
 {% block main %}
     {% if messages %}
-            {% for message in messages %}
+        {% for message in messages %}
               {% if message.tags %}<div class="alert alert-{% if message.tags == 'error' %}danger{%else%}{{message.tags}}{%endif%} alert-dismissible fade show mt-3" role="alert">{{message}}<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>{% endif %}
-            {% endfor %}
+        {% endfor %}
     {% endif %}
-    <h2>Nuvem gerada com sucesso!!</h2>
+    <h2 style="margin-top: 20px">
+        {% if doc.descritivo%}
+            {{ doc.descritivo }}
+        {% else %}
+        Nuvem gerada com sucesso!!
+        {% endif %}
+    </h2>
+
+    <img src="{{ nuvem }}" alt="" height="500">
     <p>Usuário: {{ doc.nome}}</p>
     <p>Linguagem reconhecida: {{ doc.language }}</p>
     <p><a href="{{ doc.texto}}">Arquivo Texto Otimizado</a></p>
@@ -31,7 +39,6 @@
     <div style="margin-bottom: 10px">
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">Layout</button>
     </div>
-    <img src="{{ nuvem }}" alt="" height="500">
 
   <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
