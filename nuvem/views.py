@@ -56,7 +56,11 @@ def nuvem(request, id):
                 documento.save()
     mask = None
     if documento.imagem:
-        mask = np.array(Image.open(documento.imagem))
+        try:
+            mask = np.array(Image.open(documento.imagem))
+        except Exception:
+            mask = None
+            messages.error(request, 'Não foi possivel usar a imagem como mascára, por favor selecione outra.')
 
     if documento.tipo == 'keywords':
         imagem = generate_words(nome_arquivo, documento.language, mask)
