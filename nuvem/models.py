@@ -38,7 +38,7 @@ class Documento(models.Model):
         return os.path.join(settings.MEDIA_URL, 'output', filename + '.png')
 
     def pdf_link(self):
-        return mark_safe('<a class="grp-button" href="/nuvem/nuvem/%s">Gerar Nuvem</a>' % self.id)
+        return mark_safe('<a class="grp-button" href="/nuvem/nuvem/%s?chave=%s">Gerar Nuvem</a>' % (self.id, self.chave))
 
     pdf_link.short_description = 'Nuvem'
 

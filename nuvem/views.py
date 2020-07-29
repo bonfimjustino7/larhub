@@ -113,6 +113,7 @@ def new_doc(request):
             if request.FILES:
                 if post.tipo == 'keywords':
                     filename = os.path.join(settings.MEDIA_ROOT,'output', post.arquivo.name)
+                    url_filename = os.path.join('output', post.arquivo.name)
                     with open(filename, 'w') as file_writer:
                         for file in request.FILES.getlist('arquivo'):
                             file_str = file.read().decode()
@@ -130,7 +131,7 @@ def new_doc(request):
 
                             file_writer.write(file_str)
 
-                    doc = Documento.objects.create(nome=post.nome, email=post.email, arquivo=filename,
+                    doc = Documento.objects.create(nome=post.nome, email=post.email, arquivo=url_filename,
                                                    tipo=post.tipo, chave=key)
 
                     return custom_redirect('nuvem', doc.pk, chave=key)
