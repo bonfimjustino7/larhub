@@ -4,11 +4,13 @@ import uuid
 import json
 import urllib
 import detectlanguage
+import numpy as np
+from PIL import Image
 
 from django.shortcuts import render, redirect, get_object_or_404
 
 from .models import Documento
-from .forms import DocumentoForm
+from .forms import DocumentoForm, LayoutForm
 from django.conf import settings
 from gerador.genwordcloud import generate, generate_words
 from django.contrib import messages
@@ -24,13 +26,21 @@ def home(request):
 
 def nuvem(request, id):
     documento = Documento.objects.get(pk=id)
+    form = LayoutForm(request.POST or None, request.FILES or None, initial={'descricao': documento.descritivo or None})
+
+    if request.POST:
+        if form.is_valid():
+            documento.descritivo = form.cleaned_data.get('descricao')
+            documento.imagem = form.cleaned_data.get('imagem')
+            documento.save()
+            messages.success(request, 'Alteração salva com sucesso')
 
     nome_arquivo = documento.arquivo.path
     prefix, file_extension = os.path.splitext(nome_arquivo)
-    if not os.path.exists(prefix+'.txt'):
+    if not os.path.exists(prefix + '.txt'):
         pdf2txt(documento.arquivo.path)
 
-    nome_arquivo = prefix+'.txt'
+    nome_arquivo = prefix + '.txt'
 
     if not documento.language:
         try:
@@ -44,17 +54,22 @@ def nuvem(request, id):
             if precisao > 7:
                 documento.language = lang_detect[0]['language']
                 documento.save()
+    mask = None
+    if documento.imagem:
+        mask = np.array(Image.open(documento.imagem))
 
     if documento.tipo == 'keywords':
-        imagem = generate_words(nome_arquivo, documento.language)
+        imagem = generate_words(nome_arquivo, documento.language, mask)
 
     else:
-        imagem = generate(nome_arquivo, documento.language)
+        imagem = generate(nome_arquivo, documento.language, mask)
 
     contexto = {
+        'form': form,
         'doc': documento,
         'nuvem': imagem
     }
+
     return render(request, 'nuvem.html', contexto)
 
 

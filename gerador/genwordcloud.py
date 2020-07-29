@@ -10,7 +10,7 @@ from django.conf import settings
 from difflib import SequenceMatcher
 
 
-def generate_words(nome_arquivo, language='pt'):
+def generate_words(nome_arquivo, language='pt', mask=None):
     prefix, file_extension = os.path.splitext(nome_arquivo)
 
     try:
@@ -40,8 +40,10 @@ def generate_words(nome_arquivo, language='pt'):
         for item in frequencia.most_common(100):
             writer.writerow(item)
 
-    cloud = WordCloud(width=1200, height=800, max_words=60, scale=1, background_color='white',
-                      font_path=os.path.join(settings.BASE_DIR, 'estaticos', 'fonts', 'Lato-Regular.ttf'))
+    cloud = WordCloud(width=1200, height=800, max_words=60, scale=1, background_color='white', mask=mask,
+                      font_path=os.path.join(settings.BASE_DIR, 'estaticos', 'fonts', 'Lato-Regular.ttf'),
+                      max_font_size=90, random_state=42)
+
     cloud.generate_from_frequencies(frequencia)
     cloud.to_file(prefix + '.png')
 
@@ -50,7 +52,7 @@ def generate_words(nome_arquivo, language='pt'):
     return image_filename
 
 
-def generate(nome_arquivo, language='pt'):
+def generate(nome_arquivo, language='pt', mask=None):
     excecoes = []
     sw_filename = os.path.join(settings.BASE_DIR, 'gerador', 'stopwords-%s.txt' % language)
     print(sw_filename)
@@ -103,7 +105,9 @@ def generate(nome_arquivo, language='pt'):
         for item in frequencia.most_common(100):
             writer.writerow(item)
 
-    cloud = WordCloud(width=1200, height=800, max_words=60, scale=2, background_color='white')
+    cloud = WordCloud(width=1200, height=800, max_words=60, scale=2, background_color='white',
+                      mask=mask, max_font_size=90, random_state=42)
+
     cloud.generate_from_frequencies(frequencia)
     cloud.to_file(prefix+'.png')
 

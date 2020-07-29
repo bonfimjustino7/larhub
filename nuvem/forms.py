@@ -27,3 +27,10 @@ class DocumentoForm(ModelForm):
 
         else:
             return self.cleaned_data.get('arquivo')
+
+class LayoutForm(forms.Form):
+    imagem = forms.FileField(widget=forms.FileInput(
+        attrs=(
+            {'class': 'custom-file-input', 'id': 'inputGroupFile01', 'aria-describedby': 'inputGroupFileAddon01'}
+        )), label='Imagem:')
+    descricao = forms.CharField(widget=forms.Textarea(), label='Descrição:')

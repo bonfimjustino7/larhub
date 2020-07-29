@@ -1,6 +1,28 @@
 {% extends 'base.html' %}
 {% block title %}Gerador de Nuvem de Palavras{% endblock %}
+{% load bootstrap %}
+{% block extrastyle %}
+    <style>
+        input#inputGroupFile01{
+            margin-top: 5px;
+        }
+        .form-group{
+            margin-top: 10px;
+        }
+        .modal-header{
+            margin-bottom: 16px;
+        }
+        label.custom-file-label {
+            margin-top: 6px;
+        }
+    </style>
+{% endblock %}
 {% block main %}
+    {% if messages %}
+            {% for message in messages %}
+              {% if message.tags %}<div class="alert alert-{% if message.tags == 'error' %}danger{%else%}{{message.tags}}{%endif%} alert-dismissible fade show mt-3" role="alert">{{message}}<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>{% endif %}
+            {% endfor %}
+    {% endif %}
     <h2>Nuvem gerada com sucesso!!</h2>
     <p>Usuário: {{ doc.nome}}</p>
     <p>Linguagem reconhecida: {{ doc.language }}</p>
@@ -21,19 +43,16 @@
         </button>
       </div>
       <div class="modal-body">
-        <form method="post">
-          <div class="form-group">
-            <div class="input-group">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+          <div class="input-group">
               <div class="custom-file">
-                <input type="file" class="custom-file-input" id="inputGroupFile01"
-                  aria-describedby="inputGroupFileAddon01" name="">
+                {{ form.imagem|bootstrap }}
                 <label class="custom-file-label" for="inputGroupFile01">Escolha uma Imagem</label>
               </div>
             </div>
-          </div>
           <div class="form-group">
-            <label for="message-text" class="col-form-label">Descrição:</label>
-            <textarea class="form-control" id="message-text"></textarea>
+            {{ form.descricao|bootstrap }}
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -41,7 +60,6 @@
           </div>
         </form>
       </div>
-
     </div>
   </div>
 </div>
