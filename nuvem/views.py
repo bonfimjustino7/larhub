@@ -90,7 +90,7 @@ def new_doc(request):
                             file_str = file_str.replace('\r', '')
                             linhas = []
                             for linha in file_str.split(','):
-                                linha = linha.strip()
+                                linha = linha.strip().capitalize()
                                 if len(linha) > 50:
                                     linhas.append(linha.replace(' ', ''))
                                 else:

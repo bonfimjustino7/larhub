@@ -11,6 +11,19 @@ class DocumentoForm(ModelForm):
 
     tipo = forms.ChoiceField(choices=TYPES, required=True)
 
+    class Media:
+        js = ('js/validation.js',)
+
     class Meta:
         model = Documento
         fields = ['nome', 'email', 'tipo', 'arquivo']
+
+    def clean_arquivo(self):
+        tipo = self.cleaned_data.get('tipo')
+        extension = os.path.splitext(self.cleaned_data.get('arquivo').name)[-1]
+        if tipo == 'keywords' and extension != '.txt':
+            self.add_error('arquivo', 'Extenção de arquivo inválida. Somente arquivos .txt '
+                                        'são permitidos para esse tipo de arquivo.')
+
+        else:
+            return self.cleaned_data.get('arquivo')

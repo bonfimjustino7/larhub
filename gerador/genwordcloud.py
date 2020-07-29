@@ -40,14 +40,14 @@ def generate_words(nome_arquivo, language='pt'):
         for item in frequencia.most_common(100):
             writer.writerow(item)
 
-    cloud = WordCloud(width=1200, height=800, max_words=60, scale=2, background_color='white')
+    cloud = WordCloud(width=1200, height=800, max_words=60, scale=1, background_color='white',
+                      font_path=os.path.join(settings.BASE_DIR, 'estaticos', 'fonts', 'Lato-Regular.ttf'))
     cloud.generate_from_frequencies(frequencia)
     cloud.to_file(prefix + '.png')
 
     image_filename = os.path.basename(prefix)
     image_filename = os.path.join(settings.MEDIA_URL, 'output', image_filename + '.png')
     return image_filename
-
 
 
 def generate(nome_arquivo, language='pt'):
