@@ -37,7 +37,7 @@
     <p><a href="{{ doc.texto}}">Arquivo Texto Otimizado</a></p>
     <p><a href="{{ doc.csv }}">Arquivo de Frequência</a></p>
     <div style="margin-bottom: 10px">
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">Alterar Layout</button>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" {% if not show %}disabled{% endif %}>Alterar Layout</button>
     </div>
 
   <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -51,7 +51,9 @@
       </div>
       <div class="modal-body">
         <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
+            {% if show %}
+                {% csrf_token %}
+            {% endif %}
           <div class="input-group">
               <div class="custom-file">
                 {{ form.imagem|bootstrap }}

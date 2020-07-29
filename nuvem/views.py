@@ -6,6 +6,7 @@ import urllib
 import detectlanguage
 import numpy as np
 from PIL import Image
+from django.http import HttpResponseRedirect
 
 from django.shortcuts import render, redirect, get_object_or_404
 
@@ -24,16 +25,24 @@ def home(request):
     return render(request, 'home.html')
 
 
+def custom_redirect(url_name, *args, **kwargs):
+    from django.urls import reverse
+    url = reverse(url_name, args = args)
+    params = urllib.parse.urlencode(kwargs)
+    return HttpResponseRedirect(url + "?%s" % params)
+
+
 def nuvem(request, id):
     documento = Documento.objects.get(pk=id)
     form = LayoutForm(request.POST or None, request.FILES or None, initial={'descricao': documento.descritivo or None})
+    flag = documento.chave == request.GET.get('chave')
 
     if request.POST:
         if form.is_valid():
             documento.descritivo = form.cleaned_data.get('descricao')
             documento.imagem = form.cleaned_data.get('imagem')
             documento.save()
-            messages.success(request, 'Alteração salva com sucesso')
+            messages.success(request, 'Alteração salva com sucesso.')
 
     nome_arquivo = documento.arquivo.path
     prefix, file_extension = os.path.splitext(nome_arquivo)
@@ -69,6 +78,7 @@ def nuvem(request, id):
         imagem = generate(nome_arquivo, documento.language, mask)
 
     contexto = {
+        'show': flag,
         'form': form,
         'doc': documento,
         'nuvem': imagem
@@ -99,6 +109,7 @@ def new_doc(request):
 
         if result:
             post = form.save(commit=False)
+            key = uuid.uuid4()
             if request.FILES:
                 if post.tipo == 'keywords':
                     filename = os.path.join(settings.MEDIA_ROOT,'output', post.arquivo.name)
@@ -120,9 +131,9 @@ def new_doc(request):
                             file_writer.write(file_str)
 
                     doc = Documento.objects.create(nome=post.nome, email=post.email, arquivo=filename,
-                                                   tipo=post.tipo)
+                                                   tipo=post.tipo, chave=key)
 
-                    return redirect('nuvem', doc.pk)
+                    return custom_redirect('nuvem', doc.pk, chave=key)
                 else:
                     # Verifica se todos os arquivos são PDF ou TXT antes de gravar
                     for f in request.FILES.getlist('arquivo'):
@@ -136,7 +147,8 @@ def new_doc(request):
                     docs = []
                     for f in request.FILES.getlist('arquivo'):
                         filename, extensao = os.path.splitext(str(f))
-                        doc = Documento.objects.create(nome=post.nome, email=post.email, arquivo=f, tipo=post.tipo)
+                        doc = Documento.objects.create(nome=post.nome, email=post.email, arquivo=f, tipo=post.tipo,
+                                                       chave=key)
                         if extensao == '.pdf':
                             pdf2txt(doc.arquivo.path)
                         docs.append(doc)
@@ -152,10 +164,10 @@ def new_doc(request):
                         extra_file.close()
                         extra_filename = os.path.join('output', extra_filename)
                         doc_extra = Documento.objects.create(nome=post.nome, email=post.email, arquivo=extra_filename,
-                                                             tipo=post.tipo)
-                        return redirect('nuvem', doc_extra.pk)
+                                                             tipo=post.tipo, chave=key)
+                        return custom_redirect('nuvem', doc_extra.pk, chave=key)
                     else:
-                        return redirect('nuvem', docs[0].pk)
+                        return custom_redirect('nuvem', docs[0].pk, chave=key)
             else:
                 messages.error(request, 'Nenhum arquivo enviado')
 
