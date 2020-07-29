@@ -28,6 +28,7 @@ class DocumentoForm(ModelForm):
         else:
             return self.cleaned_data.get('arquivo')
 
+
 class LayoutForm(forms.Form):
     imagem = forms.FileField(widget=forms.FileInput(
         attrs=(
