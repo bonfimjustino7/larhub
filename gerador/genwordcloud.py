@@ -29,7 +29,7 @@ def generate_words(nome_arquivo, language='pt', mask=None):
     csv_filename = prefix + '.csv'
     with open(csv_filename, "w", newline='') as csv_file:
         writer = csv.writer(csv_file, delimiter=',')
-        for item in frequencia:
+        for item in frequencia.items():
             writer.writerow(item)
 
     cloud = WordCloud(width=1200, height=800, max_words=60, scale=1, background_color='white', mask=mask,
