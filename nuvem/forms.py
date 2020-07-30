@@ -35,3 +35,4 @@ class LayoutForm(forms.Form):
             {'class': 'custom-file-input', 'id': 'inputGroupFile01', 'aria-describedby': 'inputGroupFileAddon01'}
         )), label='Imagem:', required=False)
     descricao = forms.CharField(widget=forms.Textarea(), label='Descrição:')
+    cores = forms.BooleanField(widget=forms.CheckboxInput, label='Cores da Imagem', required=False)

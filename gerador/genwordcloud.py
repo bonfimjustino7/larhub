@@ -10,7 +10,7 @@ from django.conf import settings
 import matplotlib.pyplot as plt
 
 
-def generate_words(nome_arquivo, language='pt', mask=None):
+def generate_words(nome_arquivo, language='pt', mask=None, color=False):
     prefix, file_extension = os.path.splitext(nome_arquivo)
 
     try:
@@ -37,7 +37,7 @@ def generate_words(nome_arquivo, language='pt', mask=None):
                       max_font_size=90, random_state=42)
 
     cloud.generate_from_frequencies(frequencia)
-    if mask is not None:
+    if mask is not None and color:
         image_colors = ImageColorGenerator(mask)
         cloud.recolor(color_func=image_colors)
 
@@ -48,7 +48,7 @@ def generate_words(nome_arquivo, language='pt', mask=None):
     return image_filename
 
 
-def generate(nome_arquivo, language='pt', mask=None):
+def generate(nome_arquivo, language='pt', mask=None, color=False):
     excecoes = []
     sw_filename = os.path.join(settings.BASE_DIR, 'gerador', 'stopwords-%s.txt' % language)
     print(sw_filename)
@@ -105,7 +105,7 @@ def generate(nome_arquivo, language='pt', mask=None):
                       mask=mask, max_font_size=90, random_state=42)
 
     cloud.generate_from_frequencies(frequencia)
-    if mask is not None:
+    if mask is not None and color:
         image_colors = ImageColorGenerator(mask)
         cloud.recolor(color_func=image_colors)
     cloud.to_file(prefix+'.png')

@@ -21,6 +21,8 @@ class Documento(models.Model):
     imagem = models.ImageField('Imagem Modelo', upload_to='modelo', max_length=200, null=True, blank=True)
     descritivo = models.TextField('Descritivo da Nuvem', null=True, blank=True)
     chave = models.CharField('Chave de Acesso', max_length=20, null=True, blank=True)
+    cores = models.BooleanField(default=False)
+
 
     @property
     def texto(self):

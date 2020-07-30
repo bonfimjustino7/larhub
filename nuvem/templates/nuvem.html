@@ -57,12 +57,13 @@
           <div class="input-group">
               <div class="custom-file">
                 {{ form.imagem|bootstrap }}
-                <label class="custom-file-label" for="inputGroupFile01">Escolha uma Imagem</label>
+                <label class="custom-file-label" for="inputGroupFile01" id="id_label_img">{% if doc.imagem %}{{ doc.imagem.name }}{% else %}Escolha uma Imagem{% endif %}</label>
               </div>
             </div>
           <div class="form-group">
             {{ form.descricao|bootstrap }}
           </div>
+            {{ form.cores|bootstrap }}
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             <button type="submit" class="btn btn-primary">Enviar</button>
@@ -73,4 +74,19 @@
   </div>
 </div>
 {%endblock%}
+{% block extrascript %}
+    <script>
+        document.querySelector('#inputGroupFile01').addEventListener('change', e => {
+            let checkbox = document.querySelector('#id_cores');
+            let label = document.getElementById('id_label_img')
+            if (e.target.value){
+                label.innerText =e.target.files[0].name;
+            }else{
+                label.innerText = 'Escolha uma Imagem';
+            }
+            checkbox.checked = !!e.target.value;
+        });
+    </script>
+
+{% endblock %}
 

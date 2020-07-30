@@ -34,7 +34,10 @@ def custom_redirect(url_name, *args, **kwargs):
 
 def nuvem(request, id):
     documento = Documento.objects.get(pk=id)
-    form = LayoutForm(request.POST or None, request.FILES or None, initial={'descricao': documento.descritivo or None})
+    form = LayoutForm(request.POST or None, request.FILES or None,
+                      initial={'descricao': documento.descritivo or None,
+                               'cores': documento.cores
+                               })
     
     flag = documento.chave and request.GET.get('chave') and documento.chave == request.GET.get('chave')
 
@@ -43,6 +46,8 @@ def nuvem(request, id):
             documento.descritivo = form.cleaned_data.get('descricao')
             if form.cleaned_data.get('imagem'):
                 documento.imagem = form.cleaned_data.get('imagem')
+
+            documento.cores = form.cleaned_data.get('cores')
             documento.save()
             messages.success(request, 'Alteração salva com sucesso.')
 
@@ -74,9 +79,9 @@ def nuvem(request, id):
             messages.error(request, 'Não foi possivel usar a imagem como mascára, por favor selecione outra.')
 
     if documento.tipo == 'keywords':
-        imagem = generate_words(nome_arquivo, documento.language, mask)
+        imagem = generate_words(nome_arquivo, documento.language, mask, documento.cores)
     else:
-        imagem = generate(nome_arquivo, documento.language, mask)
+        imagem = generate(nome_arquivo, documento.language, mask, documento.cores)
 
     contexto = {
         'show': flag,
