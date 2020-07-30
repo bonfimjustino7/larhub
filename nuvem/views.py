@@ -75,7 +75,6 @@ def nuvem(request, id):
         try:
             mask = np.array(Image.open(documento.imagem))
         except Exception:
-            mask = None
             messages.error(request, 'Não foi possivel usar a imagem como mascára, por favor selecione outra.')
 
     if documento.tipo == 'keywords':
