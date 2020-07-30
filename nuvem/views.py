@@ -73,7 +73,6 @@ def nuvem(request, id):
 
     if documento.tipo == 'keywords':
         imagem = generate_words(nome_arquivo, documento.language, mask)
-
     else:
         imagem = generate(nome_arquivo, documento.language, mask)
 
@@ -109,7 +108,7 @@ def new_doc(request):
 
         if result:
             post = form.save(commit=False)
-            key = uuid.uuid4()
+            key = uuid.uuid4()[:20]
             if request.FILES:
                 if post.tipo == 'keywords':
                     filename = os.path.join(settings.MEDIA_ROOT,'output', post.arquivo.name)
