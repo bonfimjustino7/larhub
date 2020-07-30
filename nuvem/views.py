@@ -40,7 +40,8 @@ def nuvem(request, id):
     if request.POST:
         if form.is_valid():
             documento.descritivo = form.cleaned_data.get('descricao')
-            documento.imagem = form.cleaned_data.get('imagem')
+            if form.cleaned_data.get('imagem'):
+                documento.imagem = form.cleaned_data.get('imagem')
             documento.save()
             messages.success(request, 'Alteração salva com sucesso.')
 
