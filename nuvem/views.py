@@ -35,7 +35,8 @@ def custom_redirect(url_name, *args, **kwargs):
 def nuvem(request, id):
     documento = Documento.objects.get(pk=id)
     form = LayoutForm(request.POST or None, request.FILES or None, initial={'descricao': documento.descritivo or None})
-    flag = documento.chave == request.GET.get('chave')
+    
+    flag = documento.chave and request.GET.get('chave') and documento.chave == request.GET.get('chave')
 
     if request.POST:
         if form.is_valid():
