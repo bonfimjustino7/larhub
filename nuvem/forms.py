@@ -33,5 +33,5 @@ class LayoutForm(forms.Form):
     imagem = forms.FileField(widget=forms.FileInput(
         attrs=(
             {'class': 'custom-file-input', 'id': 'inputGroupFile01', 'aria-describedby': 'inputGroupFileAddon01'}
-        )), label='Imagem:', allow_empty_file=True)
+        )), label='Imagem:', required=False)
     descricao = forms.CharField(widget=forms.Textarea(), label='Descrição:')
