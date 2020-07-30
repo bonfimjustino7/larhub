@@ -27,7 +27,7 @@ def home(request):
 
 def custom_redirect(url_name, *args, **kwargs):
     from django.urls import reverse
-    url = reverse(url_name, args = args)
+    url = reverse(url_name, args=args)
     params = urllib.parse.urlencode(kwargs)
     return HttpResponseRedirect(url + "?%s" % params)
 
@@ -38,7 +38,7 @@ def nuvem(request, id):
                       initial={'descricao': documento.descritivo or None,
                                'cores': documento.cores
                                })
-    
+
     flag = documento.chave and request.GET.get('chave') and documento.chave == request.GET.get('chave')
 
     if request.POST:
@@ -71,16 +71,27 @@ def nuvem(request, id):
                 documento.language = lang_detect[0]['language']
                 documento.save()
     mask = None
+    channel = 0
     if documento.imagem:
         try:
-            mask = np.array(Image.open(documento.imagem))
+            image = Image.open(documento.imagem)
+            channel = len(image.split())
+            mask = np.array(image)
         except Exception:
             messages.error(request, 'Não foi possivel usar a imagem como mascára, por favor selecione outra.')
 
-    if documento.tipo == 'keywords':
-        imagem = generate_words(nome_arquivo, documento.language, mask, documento.cores)
+    # Fix error: Not Implement methods para imagens com menos de 3 canais.
+    if channel >= 3 or not documento.cores:
+        color = documento.cores
     else:
-        imagem = generate(nome_arquivo, documento.language, mask, documento.cores)
+        messages.error(request, 'Não foi possivel pegar as cores dessa imagem, '
+                                'pois ela possui somente %s %s.' % (channel, 'canais' if channel > 1 else 'canal'))
+        color = False
+
+    if documento.tipo == 'keywords':
+        imagem = generate_words(nome_arquivo, documento.language, mask, color)
+    else:
+        imagem = generate(nome_arquivo, documento.language, mask, color)
 
     contexto = {
         'show': flag,
@@ -117,7 +128,7 @@ def new_doc(request):
             key = str(uuid.uuid4())[:20]
             if request.FILES:
                 if post.tipo == 'keywords':
-                    filename = os.path.join(settings.MEDIA_ROOT,'output', post.arquivo.name)
+                    filename = os.path.join(settings.MEDIA_ROOT, 'output', post.arquivo.name)
                     url_filename = os.path.join('output', post.arquivo.name)
                     with open(filename, 'w') as file_writer:
                         for file in request.FILES.getlist('arquivo'):
@@ -160,11 +171,11 @@ def new_doc(request):
                         docs.append(doc)
 
                     if len(docs) > 1:
-                        extra_filename = str(uuid.uuid4())+'.txt'
-                        extra_file = open(os.path.join(settings.MEDIA_ROOT, 'output',extra_filename), 'w+')
+                        extra_filename = str(uuid.uuid4()) + '.txt'
+                        extra_file = open(os.path.join(settings.MEDIA_ROOT, 'output', extra_filename), 'w+')
                         for doc in docs:
                             filename, extensao = os.path.splitext(doc.arquivo.path)
-                            with open(filename+'.txt','r') as f:
+                            with open(filename + '.txt', 'r') as f:
                                 extra_file.write(f.read())
                                 extra_file.write('\n')
                         extra_file.close()
