@@ -10,7 +10,6 @@ from django.conf import settings
 import matplotlib.pyplot as plt
 
 
-
 def generate_words(nome_arquivo, language='pt', mask=None):
     prefix, file_extension = os.path.splitext(nome_arquivo)
 
@@ -26,19 +25,11 @@ def generate_words(nome_arquivo, language='pt', mask=None):
             frequencia[linha] += 1
     arquivo.close()
 
-    duplicadas = {}
-    for linha in frequencia.most_common():
-        if linha[1] > 3:
-            duplicadas[linha[0]] = 0
-        else:
-            break
-
-        # Gera o arquivo CSV com as frequências
+    # Gera o arquivo CSV com as frequências
     csv_filename = prefix + '.csv'
-
     with open(csv_filename, "w", newline='') as csv_file:
         writer = csv.writer(csv_file, delimiter=',')
-        for item in frequencia.most_common(100):
+        for item in frequencia:
             writer.writerow(item)
 
     cloud = WordCloud(width=1200, height=800, max_words=60, scale=1, background_color='white', mask=mask,
@@ -98,7 +89,7 @@ def generate(nome_arquivo, language='pt', mask=None):
     texto = ''
     frequencia = Counter()
     for palavra in palavras:
-        if len(palavra) > 3 and palavra not in excecoes:
+        if len(palavra) > 3 and palavra not in excecoes and not palavra.isdigit():
             texto += ' ' + palavra
             frequencia[palavra] += 1
 
@@ -107,7 +98,7 @@ def generate(nome_arquivo, language='pt', mask=None):
 
     with open(csv_filename, "w", newline='') as csv_file:
         writer = csv.writer(csv_file, delimiter=',')
-        for item in frequencia.most_common(100):
+        for item in frequencia.most_common(1000):
             writer.writerow(item)
 
     cloud = WordCloud(width=1200, height=800, max_words=60, scale=2, background_color='white',

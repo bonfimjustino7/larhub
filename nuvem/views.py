@@ -41,7 +41,8 @@ def nuvem(request, id):
     if request.POST:
         if form.is_valid():
             documento.descritivo = form.cleaned_data.get('descricao')
-            documento.imagem = form.cleaned_data.get('imagem')
+            if form.cleaned_data.get('imagem'):
+                documento.imagem = form.cleaned_data.get('imagem')
             documento.save()
             messages.success(request, 'Alteração salva com sucesso.')
 
@@ -74,7 +75,6 @@ def nuvem(request, id):
 
     if documento.tipo == 'keywords':
         imagem = generate_words(nome_arquivo, documento.language, mask)
-
     else:
         imagem = generate(nome_arquivo, documento.language, mask)
 
@@ -110,7 +110,7 @@ def new_doc(request):
 
         if result:
             post = form.save(commit=False)
-            key = uuid.uuid4()
+            key = uuid.uuid4()[:20]
             if request.FILES:
                 if post.tipo == 'keywords':
                     filename = os.path.join(settings.MEDIA_ROOT,'output', post.arquivo.name)
