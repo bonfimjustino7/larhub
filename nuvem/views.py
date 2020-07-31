@@ -125,7 +125,8 @@ def new_doc(request):
 
         if result:
             post = form.save(commit=False)
-            key = str(uuid.uuid4())[:20]
+            key = str(uuid.uuid4())
+            key = key[:20]
             if request.FILES:
                 if post.tipo == 'keywords':
                     filename = os.path.join(settings.MEDIA_ROOT, 'output', post.arquivo.name)
