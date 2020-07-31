@@ -19,13 +19,18 @@ class DocumentoForm(ModelForm):
         fields = ['nome', 'email', 'tipo', 'arquivo']
 
     def clean_arquivo(self):
+        files = self.files.getlist('arquivo')
         tipo = self.cleaned_data.get('tipo')
-        extension = os.path.splitext(self.cleaned_data.get('arquivo').name)[-1]
-        if tipo == 'keywords' and extension != '.txt':
-            self.add_error('arquivo', 'Extensão de arquivo inválida. Somente arquivos .txt '
-                                      'são permitidos para esse tipo de arquivo.')
+        for file in files:
+            extension = os.path.splitext(file.name)[1]
+            if extension != '.txt' and extension != '.pdf':
+                self.add_error('arquivo', 'Extensão %s do arquivo %s inválida. Somente arquivos de textos e PDF '
+                                      'são permitidos.' % (extension, file.name))
 
-        else:
+            if tipo == 'keywords' and extension != '.txt':
+                self.add_error('arquivo', 'Extensão %s do arquivo %s inválida. Somente arquivos .txt '
+                                          'são permitidos para esse tipo de arquivo.' % (extension, file.name))
+
             return self.cleaned_data.get('arquivo')
 
 

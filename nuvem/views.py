@@ -156,7 +156,7 @@ def new_doc(request):
                                     linhas.append(linha)
 
                             # Limpando termos
-                            linhas = [termo for termo in filter(lambda x: x not in (',', ' ', '', '.'), linhas)]
+                            linhas = list(filter(lambda x: x not in (',', ' ', '', '.'), linhas))
 
                             file_str = ','.join(linhas)
 
