@@ -53,7 +53,7 @@ def pdf2txt(fname, pages=None):
     infile.close()
     converter.close()
     textfile.close()
-    return
+    return text_filename
 
 
 def pdfparser(filename):
