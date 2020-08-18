@@ -20,7 +20,7 @@ def generate_words(nome_arquivo, language='pt', mask=None, color=False):
 
     frequencia = Counter()
     for linha in arquivo.read().split(','):
-        linha = linha.strip()
+        linha = linha.strip().capitalize()
         if len(linha) > 3:
             frequencia[linha] += 1
     arquivo.close()

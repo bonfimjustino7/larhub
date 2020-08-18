@@ -149,14 +149,10 @@ def new_doc(request):
                             file_str = file_str.replace('\r', '')
                             linhas = []
                             for linha in file_str.split(','):
-                                linha = linha.strip().capitalize()
-                                if len(linha) > 50:
-                                    linhas.append(linha.replace(' ', ''))
-                                else:
-                                    linhas.append(linha)
+                                linhas.append(linha.strip())
 
                             # Limpando termos
-                            linhas = [termo for termo in filter(lambda x: x not in (',', ' ', '', '.'), linhas)]
+                            linhas = [termo for termo in filter(lambda x: x not in (',', ' ', '.'), linhas)]
 
                             file_str = ','.join(linhas)
 
