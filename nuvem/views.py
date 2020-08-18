@@ -133,17 +133,6 @@ def new_doc(request):
                     url_filename = os.path.join('output', post.arquivo.name)
                     with open(filename, 'w') as file_writer:
                         for file in request.FILES.getlist('arquivo'):
-                            extension = file.name.split('.')[-1]
-                            if extension == 'pdf':
-                                base = os.path.dirname(filename)
-                                name = os.path.basename(filename).split('.')[0] + '.pdf'
-                                pdf = open(os.path.join(base, name), 'wb')  # salva o pdf
-                                for chunk in file.chunks():
-                                    pdf.write(chunk)
-
-                                new_filename = pdf2txt(os.path.join(base, name))
-                                file = open(new_filename, 'rb')
-
                             file_str = file.read().decode()
                             file_str = re.sub(r'[\n]', ',', file_str)
                             file_str = file_str.replace('\r', '')
