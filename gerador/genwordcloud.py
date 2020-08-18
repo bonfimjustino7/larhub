@@ -19,10 +19,11 @@ def generate_words(nome_arquivo, language='pt', mask=None, color=False):
         arquivo = open(nome_arquivo, 'r', encoding='ISO-8859-1')
 
     frequencia = Counter()
-    for linha in arquivo.read().split(','):
-        linha = linha.strip().capitalize()
-        if len(linha) > 3:
-            frequencia[linha] += 1
+    for linha in arquivo.readlines():
+        for key in linha.split(','):
+            keyword = key.strip().capitalize()
+            if keyword:
+                frequencia[keyword] += 1
     arquivo.close()
 
     # Gera o arquivo CSV com as frequências

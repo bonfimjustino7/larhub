@@ -131,22 +131,6 @@ def new_doc(request):
                 if post.tipo == 'keywords':
                     filename = os.path.join(settings.MEDIA_ROOT, 'output', post.arquivo.name)
                     url_filename = os.path.join('output', post.arquivo.name)
-                    with open(filename, 'w') as file_writer:
-                        for file in request.FILES.getlist('arquivo'):
-                            file_str = file.read().decode()
-                            file_str = re.sub(r'[\n]', ',', file_str)
-                            file_str = file_str.replace('\r', '')
-                            linhas = []
-                            for linha in file_str.split(','):
-                                linhas.append(linha.strip())
-
-                            # Limpando termos
-                            linhas = [termo for termo in filter(lambda x: x not in (',', ' ', '.'), linhas)]
-
-                            file_str = ','.join(linhas)
-
-                            file_writer.write(file_str)
-
                     doc = Documento.objects.create(nome=post.nome, email=post.email, arquivo=url_filename,
                                                    tipo=post.tipo, chave=key)
 
