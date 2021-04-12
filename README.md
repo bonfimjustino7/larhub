@@ -1,11 +1,11 @@
 # Nuvem de Palavras Larhud
 Este serviço permite gerar uma nuvem de palavras para textos em português, inglês ou espanhol.
 O intuito é que um usuário leigo possa executar uma nuvem de palavras sem que precise instalar nenhum software
-em seu computador. Para tal, o usuário precisa apenas enviar um arquivo em PDF ou TXT e o serviço irá gerar a imagem com uma nuvem de palavras.
+em seu computador. Para tal, o usuário precisa apenas enviar um arquivo em PDF ou TXT e o serviço irá gerar a imagem com a nuvem de palavras gerada a partir do texto.
 
 ## Como instalar
 
-    git clone <repositorio> larhud
+    git clone git@github.com:bonfimjustino7/larhub.git larhud
     cd larhud
     virtualenv -p python3 venv
     source venv/bin/activate
