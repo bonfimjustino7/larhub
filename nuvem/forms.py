@@ -24,8 +24,9 @@ class DocumentoForm(ModelForm):
         for file in files:
             extension = os.path.splitext(file.name)[1]
             if extension != '.txt' and extension != '.pdf':
-                self.add_error('arquivo', 'Extensão %s do arquivo %s inválida. Somente arquivos de textos e PDF '
-                                      'são permitidos.' % (extension, file.name))
+                self.add_error('arquivo',
+                               'Extensão %s do arquivo %s inválida. Somente arquivos de textos e PDF '
+                               'são permitidos.' % (extension, file.name))
 
             if tipo == 'keywords' and extension != '.txt':
                 self.add_error('arquivo', 'Extensão %s do arquivo %s inválida. Somente arquivos .txt '
@@ -39,5 +40,9 @@ class LayoutForm(forms.Form):
         attrs=(
             {'class': 'custom-file-input', 'id': 'inputGroupFile01', 'aria-describedby': 'inputGroupFileAddon01'}
         )), label='Imagem:', required=False)
-    descricao = forms.CharField(widget=forms.Textarea(), label='Descrição:')
-    cores = forms.BooleanField(widget=forms.CheckboxInput, label='Cores da Imagem', required=False)
+    descricao = forms.CharField(widget=forms.Textarea(),
+                                label='Descrição:', required=False)
+    stopwords = forms.CharField(widget=forms.Textarea(),
+                                label='Adicione mais stopwords (separando-as por ","):', required=False)
+    cores = forms.BooleanField(widget=forms.CheckboxInput,
+                               label='Cores da Imagem', required=False)

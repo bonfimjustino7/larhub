@@ -1,15 +1,15 @@
 Django<3
-django-bootstrap-form==3.4
-Pillow==6.2.0
-PyPDF2==1.26.0
-pytz==2019.1
-sqlparse==0.3.0
-six==1.12.0
-sqlparse==0.3.0
+django-bootstrap-form
+Pillow
+PyPDF2
+pytz
+sqlparse
+six
+sqlparse
 wordcloud
 pdfminer3
 matplotlib
 gunicorn
-detectlanguage==1.3.0
+detectlanguage
 
 

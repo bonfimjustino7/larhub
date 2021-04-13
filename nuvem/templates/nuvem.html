@@ -34,7 +34,7 @@
     <img src="{{ nuvem }}" alt="" height="500">
     <p>Usuário: {{ doc.nome}}</p>
     <p>Linguagem reconhecida: {{ doc.language }}</p>
-    <p><a href="{{ doc.texto}}">Arquivo Texto Otimizado</a></p>
+    <p><a href="{{ doc.texto}}">Arquivo Texto já sem as stopwords</a></p>
     <p><a href="{{ doc.csv }}">Arquivo de Frequência</a></p>
 
     {% if show %}
@@ -63,6 +63,9 @@
             </div>
           <div class="form-group">
             {{ form.descricao|bootstrap }}
+          </div>
+          <div class="form-group">
+            {{ form.stopwords|bootstrap }}
           </div>
             {{ form.cores|bootstrap }}
           <div class="modal-footer">

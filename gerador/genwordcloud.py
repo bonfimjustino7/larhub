@@ -49,14 +49,17 @@ def generate_words(nome_arquivo, language='pt', mask=None, color=False):
     return image_filename
 
 
-def generate(nome_arquivo, language='pt', mask=None, color=False):
+def generate(nome_arquivo, stopwords=None, language='pt', mask=None, color=False):
     excecoes = []
     sw_filename = os.path.join(settings.BASE_DIR, 'gerador', 'stopwords-%s.txt' % language)
-    print(sw_filename)
     if language and os.path.exists(sw_filename):
         for linha in open(sw_filename).read().lower().split('\n'):
             for palavra in linha.split(','):
                 excecoes.append(palavra.strip())
+
+    if stopwords:
+        for palavra in stopwords.split(','):
+            excecoes.append(palavra.strip())
 
     try:
         arquivo = open(nome_arquivo, 'r')
@@ -77,33 +80,30 @@ def generate(nome_arquivo, language='pt', mask=None, color=False):
         else:
             break
 
-    palavras = []
     prefix, file_extension = os.path.splitext(nome_arquivo)
-    arq_limpo = open(prefix+'.dedup', 'w')
+    arq_limpo = open(prefix + '.dedup', 'w', encoding='utf-8')
+    frequencia = Counter()
     for linha in open(nome_arquivo, 'r').read().lower().split('\n'):
         if linha not in duplicadas:
-            arq_limpo.write(linha+'\n')
-            palavras += re.findall(r'\w+', linha)
+            texto = ''
+            for palavra in re.findall(r'\w+', linha):
+                # Monta o texto final remove as palavras da lista de exceções e que sejam menores que 3 caracteres
+                if len(palavra) > 3 and palavra not in excecoes and not palavra.isdigit():
+                    frequencia[palavra] += 1
+                    texto += ' ' + palavra
+            if texto.strip() != '':
+                arq_limpo.write(texto + '\n')
     arq_limpo.close()
-
-    # Monta o texto final remove as palavras da lista de exceções e que sejam menores que 3 caracteres
-    texto = ''
-    frequencia = Counter()
-    for palavra in palavras:
-        if len(palavra) > 3 and palavra not in excecoes and not palavra.isdigit():
-            texto += ' ' + palavra
-            frequencia[palavra] += 1
 
     # Gera o arquivo CSV com as frequências
     csv_filename = prefix + '.csv'
-
     with open(csv_filename, "w", newline='') as csv_file:
         writer = csv.writer(csv_file, delimiter=',')
         for item in frequencia.most_common(1000):
             writer.writerow(item)
 
     cloud = WordCloud(width=1200, height=800, max_words=60, scale=2, background_color='white',
-                      mask=mask, max_font_size=90, random_state=42)
+                      mask=mask, max_font_size=90, random_state=42, )
 
     cloud.generate_from_frequencies(frequencia)
     if mask is not None and color:

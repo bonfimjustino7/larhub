@@ -20,14 +20,14 @@ class Documento(models.Model):
     tipo = models.CharField(max_length=12, choices=TYPES, null=True, blank=True)
     imagem = models.ImageField('Imagem Modelo', upload_to='modelo', max_length=200, null=True, blank=True)
     descritivo = models.TextField('Descritivo da Nuvem', null=True, blank=True)
+    stopwords = models.TextField('Stopwords Extras', null=True, blank=True)
     chave = models.CharField('Chave de Acesso', max_length=20, null=True, blank=True)
     cores = models.BooleanField(default=False)
-
 
     @property
     def texto(self):
         filename = os.path.splitext(os.path.basename(self.arquivo.path))[0]
-        return os.path.join(settings.MEDIA_URL, 'output', filename+'.txt')
+        return os.path.join(settings.MEDIA_URL, 'output', filename+'.dedup')
 
     @property
     def csv(self):

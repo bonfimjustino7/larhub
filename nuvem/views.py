@@ -46,7 +46,9 @@ def nuvem(request, id):
             documento.descritivo = form.cleaned_data.get('descricao')
             if form.cleaned_data.get('imagem'):
                 documento.imagem = form.cleaned_data.get('imagem')
-
+            else:
+                documento.imagem = None
+            documento.stopwords = form.cleaned_data.get('stopwords')
             documento.cores = form.cleaned_data.get('cores')
             documento.save()
             messages.success(request, 'Alteração salva com sucesso.')
@@ -57,6 +59,8 @@ def nuvem(request, id):
         pdf2txt(documento.arquivo.path)
 
     nome_arquivo = prefix + '.txt'
+    if os.path.exists(prefix + '.dedup'):
+        os.rename(prefix + '.dedup', nome_arquivo)
 
     if not documento.language:
         try:
@@ -91,7 +95,7 @@ def nuvem(request, id):
     if documento.tipo == 'keywords':
         imagem = generate_words(nome_arquivo, documento.language, mask, color)
     else:
-        imagem = generate(nome_arquivo, documento.language, mask, color)
+        imagem = generate(nome_arquivo, documento.stopwords, documento.language, mask, color)
 
     contexto = {
         'show': flag,
