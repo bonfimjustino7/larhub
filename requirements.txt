@@ -3,9 +3,9 @@ django-bootstrap-form==3.4
 Pillow==8.1.1
 PyPDF2==1.26.0
 pytz==2019.1
-sqlparse==0.3.0
+sqlparse==0.4.4
 six==1.12.0
-sqlparse==0.3.0
+sqlparse==0.4.4
 wordcloud==1.5.0
 pdfminer3
 matplotlib
